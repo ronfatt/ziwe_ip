@@ -4,23 +4,20 @@ import React from 'react';
 import Link from 'next/link';
 import { useAssessmentStore } from '@/store/assessmentStore';
 import { FOURTEEN_STARS, DEMO_PRESETS } from '@/data/archetypes';
+import { getSimplifiedIndustryFit } from '@/data/industryFitData';
 import {
   Sparkles,
   Download,
-  Share2,
   Printer,
   Compass,
   Briefcase,
   Target,
-  LineChart,
-  ShieldCheck,
-  CheckCircle2,
-  AlertCircle,
   ArrowRight,
   TrendingUp,
-  Cpu,
-  Layers,
-  Award
+  Award,
+  CheckCircle2,
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 import {
   Radar,
@@ -34,317 +31,258 @@ import {
 export default function ReportSummaryPage() {
   const {
     birthInfo,
-    profile,
     activePresetId,
     computedScores,
-    careerDNA,
     brandDNA,
-    businessDNA,
-    roadmap,
-    isDemoChartMode
+    businessDNA
   } = useAssessmentStore();
 
   const preset = DEMO_PRESETS.find((p) => p.id === activePresetId) || DEMO_PRESETS[0];
   const star = FOURTEEN_STARS[preset.archetypeKey] || FOURTEEN_STARS['tian_ji'];
 
-  // Radar chart data preparation
+  // 3 Clear Industry Fits (Direct, Simple, Explicit)
+  const threeIndustryFits = getSimplifiedIndustryFit(preset.archetypeKey);
+
+  // Radar chart data
   const radarData = [
-    { subject: '领导大局', score: computedScores.leadership || 75 },
+    { subject: '大局统筹', score: computedScores.leadership || 75 },
     { subject: '战略推演', score: computedScores.strategic_thinking || 88 },
-    { subject: '创新创造', score: computedScores.creativity || 82 },
-    { subject: '坚毅执行', score: computedScores.execution || 78 },
-    { subject: '表达说服', score: computedScores.communication || 85 },
-    { subject: '高价值人脉', score: computedScores.relationship_building || 70 },
+    { subject: '创意创新', score: computedScores.creativity || 82 },
+    { subject: '结果执行', score: computedScores.execution || 78 },
+    { subject: '说服沟通', score: computedScores.communication || 85 },
+    { subject: '人脉协同', score: computedScores.relationship_building || 70 },
     { subject: '商业敏锐', score: computedScores.business_dev || 80 },
     { subject: '知识布道', score: computedScores.knowledge_sharing || 86 }
   ];
 
   return (
-    <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
-      {/* 1. Header Bar with Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+    <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6">
+      {/* 1. Header with Compact Meta */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-[#38D9D0] px-2.5 py-0.5 rounded bg-[#38D9D0]/10 border border-[#38D9D0]/20">
-              CONFIDENTIAL REPORT
+            <span className="text-[10px] font-mono text-[#38D9D0] px-2 py-0.5 rounded bg-[#38D9D0]/10 border border-[#38D9D0]/20">
+              IP DNA 结论报告
             </span>
-            <span className="text-xs font-mono text-gray-400">
-              ID: ZW-{Math.abs(birthInfo.displayName.length * 892 + 1024).toString(16).toUpperCase()}
+            <span className="text-[11px] text-gray-400 font-mono">
+              学员：{birthInfo.displayName || '个人'} · {birthInfo.birthDate}
             </span>
-            {isDemoChartMode && (
-              <span className="text-xs font-mono text-[#9375FF] px-2 py-0.5 rounded bg-[#9375FF]/10 border border-[#9375FF]/20">
-                教学范例盘
-              </span>
-            )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            {birthInfo.displayName || '学员'} 的专属 IP DNA™ 战略全景报告
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>你的核心原型：</span>
+            <span className="text-gradient-violet-cyan">{star.nameCn} · {star.archetypeTitle}</span>
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-mono">
-            生成时间：2026-10-09 · 基于东方原型与现代商业双层交叉校验
-          </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => window.print()}
-            className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 flex items-center gap-1.5 transition"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-gray-300 flex items-center gap-1 transition"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>打印 / 导出 PDF</span>
+            <span>保存/打印</span>
           </button>
-
           <Link
             href="/consultation"
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#9375FF] to-[#38D9D0] text-black font-semibold text-xs shadow-md shadow-[#9375FF]/20 hover:opacity-95 transition"
+            className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#9375FF] to-[#38D9D0] text-black font-semibold text-[11px] transition"
           >
-            <span>预约专家解读</span>
+            预约导师
           </Link>
         </div>
       </div>
 
-      {/* 2. Sub-Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-white/5 pb-3 text-xs font-medium">
-        <Link
-          href="/report"
-          className="px-4 py-2 rounded-lg bg-[#1A2540] text-[#38D9D0] border border-[#38D9D0]/30"
-        >
-          全景概览 (Overview)
-        </Link>
-        <Link
-          href="/report/career"
-          className="px-4 py-2 rounded-lg bg-[#121B2D] text-gray-300 hover:text-white border border-white/5 transition"
-        >
-          职业发展 DNA (Career)
-        </Link>
-        <Link
-          href="/report/brand"
-          className="px-4 py-2 rounded-lg bg-[#121B2D] text-gray-300 hover:text-white border border-white/5 transition"
-        >
-          个人品牌定位 (Brand)
-        </Link>
-        <Link
-          href="/report/business"
-          className="px-4 py-2 rounded-lg bg-[#121B2D] text-gray-300 hover:text-white border border-white/5 transition"
-        >
-          商业变现模型 (Business)
-        </Link>
-        <Link
-          href="/report/roadmap"
-          className="px-4 py-2 rounded-lg bg-[#121B2D] text-gray-300 hover:text-white border border-white/5 transition"
-        >
-          90天行动路线图 (Roadmap)
-        </Link>
-      </div>
-
-      {/* 3. Executive Summary Hero Card */}
-      <div className="rounded-3xl glass-panel-elevated p-6 sm:p-8 border border-[#9375FF]/30 relative overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-          <div className="lg:col-span-2 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#9375FF]/10 text-[#9375FF] text-xs font-mono">
-              <Award className="w-3.5 h-3.5" />
-              <span>CORE ARCHETYPE SYNTHESIS</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">
-              核心战略原型：{star.archetypeTitle}
+      {/* 2. PRIORITY SECTION: TOP 3 SUITABLE IP DNA INDUSTRIES (首先明确指出3个适合他的行业) */}
+      <div className="rounded-2xl glass-panel-elevated p-5 sm:p-6 border border-[#38D9D0]/30 space-y-4 relative overflow-hidden">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-[#38D9D0]" />
+            <h2 className="text-base font-bold text-white">
+              最适合你的 3 个 IP DNA 行业性质定位
             </h2>
-            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-              基于您的命宫主星【{star.nameCn}】及深耕 {profile.yearsOfExperience || 5} 年的【{profile.industry || '专业服务'}】实战底色，推演显示你具备极强的【{star.strengths[0]}】与【{star.strengths[1]}】。你天然适合从单一体力交付转型为拥有知识溢价的独立战略军师。
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 font-mono">
-              <div className="p-3 rounded-xl bg-[#080D18]/80 border border-white/5">
-                <span className="text-[10px] text-gray-400 block">主导文化星宿</span>
-                <span className="text-xs font-bold text-[#9375FF]">{star.nameCn}</span>
-              </div>
-              <div className="p-3 rounded-xl bg-[#080D18]/80 border border-white/5">
-                <span className="text-[10px] text-gray-400 block">核心角色形态</span>
-                <span className="text-xs font-bold text-[#38D9D0]">战略架构师</span>
-              </div>
-              <div className="p-3 rounded-xl bg-[#080D18]/80 border border-white/5">
-                <span className="text-[10px] text-gray-400 block">首选变现路径</span>
-                <span className="text-xs font-bold text-white">高客单闭门顾问</span>
-              </div>
-              <div className="p-3 rounded-xl bg-[#080D18]/80 border border-white/5">
-                <span className="text-[10px] text-gray-400 block">首要盲区防范</span>
-                <span className="text-xs font-bold text-rose-400">过度推演延迟验证</span>
-              </div>
-            </div>
           </div>
-
-          {/* Radar Chart Display */}
-          <div className="h-64 sm:h-72 w-full flex flex-col items-center justify-center p-2 rounded-2xl bg-[#080D18]/60 border border-white/5">
-            <span className="text-[11px] font-mono text-gray-400 mb-1">
-              8大商业能力雷达图 (Radar Profile)
-            </span>
-            <ResponsiveContainer width="100%" height="90%">
-              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                <PolarGrid stroke="#2A3855" />
-                <PolarAngleAxis dataKey="subject" stroke="#9DA9C0" tick={{ fill: '#9DA9C0', fontSize: 10 }} />
-                <PolarRadiusAxis stroke="#1A2540" angle={30} domain={[0, 100]} />
-                <Radar name="能力指数" dataKey="score" stroke="#38D9D0" fill="#9375FF" fillOpacity={0.4} />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Dual-Layer Palace Analysis (Layer A + Layer B) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Layer A Card */}
-        <div className="p-6 rounded-2xl glass-panel space-y-4 border-l-4 border-l-[#9375FF]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-white font-semibold text-sm">
-              <Compass className="w-4 h-4 text-[#9375FF]" />
-              <span>层级 A：东方文化原型与四化格局</span>
-            </div>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              文献溯源通过
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {Object.values(preset.palaces).map((pal, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-[#080D18]/60 border border-white/5 space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-white">{pal.palaceNameCn}</span>
-                  <div className="flex gap-1">
-                    {pal.majorStars.map((s) => (
-                      <span key={s} className="px-1.5 py-0.2 rounded bg-[#9375FF]/20 text-[#9375FF] font-mono text-[10px]">
-                        {FOURTEEN_STARS[s]?.nameCn || s}
-                      </span>
-                    ))}
-                    {pal.mutagen && (
-                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono text-[10px]">
-                        化{pal.mutagen === 'Lu' ? '禄' : pal.mutagen === 'Quan' ? '权' : pal.mutagen === 'Ke' ? '科' : '忌'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  {pal.explanation}
-                </p>
-              </div>
-            ))}
-          </div>
+          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            高匹配优先排序
+          </span>
         </div>
 
-        {/* Layer B Card */}
-        <div className="p-6 rounded-2xl glass-panel space-y-4 border-l-4 border-l-[#38D9D0]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-white font-semibold text-sm">
-              <Briefcase className="w-4 h-4 text-[#38D9D0]" />
-              <span>层级 B：现代商业实战与技能资产</span>
-            </div>
-            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-              实战经验校验
-            </span>
-          </div>
+        <p className="text-xs text-gray-300">
+          基于你的【{star.nameCn}】天赋底色与心智特质，你最容易发挥优势、避开精力内耗的 3 大行业性质如下：
+        </p>
 
-          <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-xl bg-[#080D18]/60 border border-white/5 space-y-1">
-              <span className="text-gray-400 block text-[11px]">实战积累与深耕赛道</span>
-              <p className="text-white font-medium">
-                {profile.currentProfession || '资深专家'} · {profile.industry}（{profile.yearsOfExperience}年实战）
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-[#080D18]/60 border border-white/5 space-y-1">
-              <span className="text-gray-400 block text-[11px]">三大核心技能底牌</span>
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {profile.topSkills.map((sk, idx) => (
-                  <span key={idx} className="text-[11px] px-2 py-0.5 rounded bg-white/5 text-gray-200 border border-white/10">
-                    {sk}
+        {/* 3 Industry Cards - Direct, Concise, Practical */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1">
+          {threeIndustryFits.map((item) => (
+            <div
+              key={item.rank}
+              className="p-4 rounded-xl bg-[#080D18]/90 border border-white/10 space-y-3 flex flex-col justify-between hover:border-[#38D9D0]/50 transition"
+            >
+              <div className="space-y-2">
+                {/* Rank & Industry Title */}
+                <div className="flex items-center justify-between">
+                  <span
+                    className="text-[10px] font-bold font-mono px-2 py-0.5 rounded"
+                    style={{ backgroundColor: `${item.tagColor}20`, color: item.tagColor }}
+                  >
+                    行业 0{item.rank}
                   </span>
-                ))}
+                  <span className="text-[11px] text-gray-400 font-mono">适合角色</span>
+                </div>
+
+                <h3 className="text-sm font-bold text-white leading-snug">
+                  {item.industryCategory}
+                </h3>
+
+                <div className="text-xs font-semibold text-[#38D9D0]">
+                  ➔ {item.roleTitle}
+                </div>
+
+                {/* Core Trait */}
+                <div className="p-2.5 rounded-lg bg-white/5 border border-white/5 space-y-1">
+                  <span className="text-[10px] text-gray-400 font-mono block">特质优势：</span>
+                  <p className="text-xs text-gray-200 leading-relaxed font-medium">
+                    {item.coreTrait}
+                  </p>
+                </div>
+
+                {/* Suitable Doing */}
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] text-gray-400 font-mono block">具体适合做什么业务：</span>
+                  <ul className="text-xs text-gray-300 space-y-1">
+                    {item.suitableDoing.map((action, aidx) => (
+                      <li key={aidx} className="flex items-start gap-1.5">
+                        <span className="text-[#38D9D0] font-bold text-xs mt-0.5">•</span>
+                        <span>{action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Monetization Path */}
+              <div className="pt-2.5 border-t border-white/10">
+                <span className="text-[10px] text-gray-400 font-mono block">建议变现模式：</span>
+                <span className="text-xs font-semibold text-amber-300">
+                  {item.monetizationPath}
+                </span>
               </div>
             </div>
-
-            <div className="p-3 rounded-xl bg-[#080D18]/60 border border-white/5 space-y-1">
-              <span className="text-gray-400 block text-[11px]">当前核心瓶颈破解切入点</span>
-              <p className="text-gray-300 leading-relaxed text-[11px]">
-                {profile.careerChallenge || '从工时交付升级为知识资产复利'}
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* 5. Brand Positioning Formula Spotlight */}
+      {/* 3. SIMPLIFIED ESSENCE: CHARACTERISTICS & BLINDSPOTS (简单明了的特质说明) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Natural Strengths */}
+        <div className="p-4 rounded-xl glass-panel space-y-2.5 border-l-4 border-l-[#38D9D0]">
+          <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase font-mono">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#38D9D0]" />
+            <span>天然天赋底牌 (做什么最顺手)</span>
+          </h3>
+          <ul className="space-y-1.5 text-xs text-gray-200">
+            {star.strengths.map((str, idx) => (
+              <li key={idx} className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38D9D0]" />
+                <span>{str}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Blindspots to Avoid */}
+        <div className="p-4 rounded-xl glass-panel space-y-2.5 border-l-4 border-l-rose-500">
+          <h3 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase font-mono">
+            <span className="text-rose-400">!</span>
+            <span>注意防范的盲区 (避开耗损陷阱)</span>
+          </h3>
+          <ul className="space-y-1.5 text-xs text-rose-200/90">
+            {star.blindSpots.map((b, idx) => (
+              <li key={idx} className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* 4. BRAND POSITIONING SUMMARY (一句话定位公式) */}
       {brandDNA && (
-        <div className="rounded-2xl glass-panel-elevated p-6 sm:p-8 border border-white/10 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-white font-semibold text-sm">
-              <Target className="w-4 h-4 text-[#38D9D0]" />
-              <span>核心个人品牌定位公式 (Brand Positioning Formula)</span>
-            </div>
-            <Link href="/report/brand" className="text-xs text-[#38D9D0] hover:underline flex items-center gap-1">
-              <span>自定义微调</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+        <div className="p-4 sm:p-5 rounded-xl glass-panel space-y-2 border border-white/10">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-white flex items-center gap-1.5">
+              <Target className="w-3.5 h-3.5 text-[#9375FF]" />
+              <span>你的一句话个人品牌定位公式</span>
+            </span>
+            <Link href="/report/brand" className="text-[11px] text-[#38D9D0] hover:underline">
+              查看更多变体 →
             </Link>
           </div>
-
-          <div className="p-4 rounded-xl bg-[#080D18] border border-[#9375FF]/30 text-sm sm:text-base text-gray-100 font-medium leading-relaxed">
+          <div className="p-3 rounded-lg bg-[#080D18] border border-[#9375FF]/30 text-xs sm:text-sm text-gray-100 font-medium leading-relaxed">
             &ldquo;{brandDNA.positioningStatement}&rdquo;
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-            {brandDNA.positioningAlternatives.map((alt, idx) => (
-              <div key={idx} className="p-3 rounded-xl bg-white/5 text-xs text-gray-300 leading-relaxed border border-white/5">
-                <span className="text-[10px] font-mono text-[#9375FF] block mb-1">备选版本 {idx + 1}</span>
-                {alt}
-              </div>
-            ))}
           </div>
         </div>
       )}
 
-      {/* 6. Quick Module Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Link
-          href="/report/career"
-          className="p-5 rounded-2xl glass-panel hover:border-[#9375FF]/50 transition group flex flex-col justify-between"
-        >
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-[#38D9D0] transition">
-              深度行业探索与职业角色 →
-            </h3>
-            <p className="text-xs text-gray-400">
-              了解3个推荐行业方向的入场壁垒、试错成本与发展阶梯。
-            </p>
+      {/* 5. RADAR & MONETIZATION SNAPSHOT */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Radar */}
+        <div className="p-4 rounded-xl glass-panel space-y-2 flex flex-col items-center">
+          <span className="text-xs font-semibold text-white self-start">8 维能力评估雷达</span>
+          <div className="h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="68%" data={radarData}>
+                <PolarGrid stroke="#2A3855" />
+                <PolarAngleAxis dataKey="subject" stroke="#9DA9C0" tick={{ fill: '#9DA9C0', fontSize: 10 }} />
+                <PolarRadiusAxis stroke="#1A2540" angle={30} domain={[0, 100]} />
+                <Radar name="指数" dataKey="score" stroke="#38D9D0" fill="#9375FF" fillOpacity={0.4} />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
-          <span className="text-[11px] text-[#9375FF] font-mono mt-4 block">查看 Career DNA 报告</span>
-        </Link>
+        </div>
 
-        <Link
-          href="/report/business"
-          className="p-5 rounded-2xl glass-panel hover:border-[#38D9D0]/50 transition group flex flex-col justify-between"
-        >
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-[#38D9D0] transition">
-              轻资产商业变现与定价 →
-            </h3>
-            <p className="text-xs text-gray-400">
-              1对1咨询、私享训练营与数字资产的可行性打分与获客实验。
-            </p>
+        {/* 90-Day Quick Action */}
+        <div className="p-4 rounded-xl glass-panel space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-[#38D9D0]" />
+              <span>未来 90 天最紧要的三件事</span>
+            </span>
+            <div className="space-y-2 text-xs">
+              <div className="p-2.5 rounded-lg bg-[#080D18]/80 border border-white/5">
+                <span className="text-[10px] text-[#9375FF] font-mono block">1-30天：</span>
+                <span className="text-gray-200">打磨上述行业01的单点方案，完成前2位真实客户交付。</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#080D18]/80 border border-white/5">
+                <span className="text-[10px] text-[#38D9D0] font-mono block">31-60天：</span>
+                <span className="text-gray-200">围绕核心特质发表3篇深度干货长文，沉淀案例背书。</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-[#080D18]/80 border border-white/5">
+                <span className="text-[10px] text-amber-300 font-mono block">61-90天：</span>
+                <span className="text-gray-200">正式推出高客单闭门咨询/小班营，跑通正向现金流。</span>
+              </div>
+            </div>
           </div>
-          <span className="text-[11px] text-[#38D9D0] font-mono mt-4 block">查看 Business DNA 报告</span>
-        </Link>
 
+          <Link
+            href="/report/roadmap"
+            className="text-[11px] text-[#38D9D0] hover:underline self-end"
+          >
+            查看完整90天路线表 →
+          </Link>
+        </div>
+      </div>
+
+      {/* 6. Bottom Advisor CTA */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#121B2D] via-[#1A2540] to-[#121B2D] border border-[#9375FF]/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div>
+          <h4 className="text-sm font-bold text-white">想进一步根据手头资源定制变现路径？</h4>
+          <p className="text-xs text-gray-400">预约专业导师 1对1 闭门推演，逐条梳理首批高客单客户线索。</p>
+        </div>
         <Link
-          href="/report/roadmap"
-          className="p-5 rounded-2xl glass-panel hover:border-[#9375FF]/50 transition group flex flex-col justify-between"
+          href="/consultation"
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#9375FF] to-[#38D9D0] text-black font-semibold text-xs whitespace-nowrap hover:opacity-95 transition"
         >
-          <div>
-            <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-[#38D9D0] transition">
-              90天战役与三年路线图 →
-            </h3>
-            <p className="text-xs text-gray-400">
-              分阶段拆解第一步如何斩获首批付费客户与建立权威长文。
-            </p>
-          </div>
-          <span className="text-[11px] text-[#9375FF] font-mono mt-4 block">查看实操蓝图</span>
+          预约导师 1对1 咨询
         </Link>
       </div>
     </div>
