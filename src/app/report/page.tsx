@@ -5,19 +5,20 @@ import Link from 'next/link';
 import { useAssessmentStore } from '@/store/assessmentStore';
 import { FOURTEEN_STARS, DEMO_PRESETS } from '@/data/archetypes';
 import { getSimplifiedIndustryFit } from '@/data/industryFitData';
+import { calculateBaziVisualGuidance } from '@/data/baziVisuals';
 import {
   Sparkles,
-  Download,
   Printer,
   Compass,
-  Briefcase,
   Target,
   ArrowRight,
-  TrendingUp,
-  Award,
   CheckCircle2,
   Zap,
-  HelpCircle
+  Palette,
+  Camera,
+  Shirt,
+  Sun,
+  ShieldCheck
 } from 'lucide-react';
 import {
   Radar,
@@ -40,8 +41,11 @@ export default function ReportSummaryPage() {
   const preset = DEMO_PRESETS.find((p) => p.id === activePresetId) || DEMO_PRESETS[0];
   const star = FOURTEEN_STARS[preset.archetypeKey] || FOURTEEN_STARS['tian_ji'];
 
-  // 3 Clear Industry Fits (Direct, Simple, Explicit)
+  // 1. 3 Clear Industry Fits (Direct, Simple, Explicit)
   const threeIndustryFits = getSimplifiedIndustryFit(preset.archetypeKey);
+
+  // 2. 八字喜用神辅助视觉逻辑（穿衣颜色、镜头布景、灯光风格）
+  const baziVisuals = calculateBaziVisualGuidance(birthInfo.birthDate);
 
   // Radar chart data
   const radarData = [
@@ -170,7 +174,106 @@ export default function ReportSummaryPage() {
         </div>
       </div>
 
-      {/* 3. SIMPLIFIED ESSENCE: CHARACTERISTICS & BLINDSPOTS (简单明了的特质说明) */}
+      {/* 3. BAZI FAVORABLE ELEMENT VISUAL STYLING ENGINE (八字喜用神辅助：穿衣颜色与直播/拍摄布景风格) */}
+      <div className="rounded-2xl glass-panel-elevated p-5 sm:p-6 border border-[#9375FF]/30 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4 text-[#9375FF]" />
+            <h2 className="text-base font-bold text-white">
+              八字喜用神视觉赋能 (出镜穿搭 & 拍摄布景风格)
+            </h2>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <span className="text-gray-400">辅助命局喜用：</span>
+            <span className="px-2 py-0.5 rounded bg-[#9375FF]/20 text-[#9375FF] font-bold">
+              五行喜 {baziVisuals.elementNameCn}
+            </span>
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-300">
+          八字喜用神作为<strong>辅助气场调候</strong>，用于指导个人 IP 的<strong>视觉穿搭调性、直播间/视频背景色彩与环境灯光</strong>，让受众第一眼产生高信任与高舒适度：
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* A. 穿衣搭配指南 */}
+          <div className="p-4 rounded-xl bg-[#080D18]/80 border border-white/5 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-white">
+              <Shirt className="w-3.5 h-3.5 text-[#38D9D0]" />
+              <span>适合穿的衣服颜色与款式 (Dressing Styling)</span>
+            </div>
+
+            {/* Colors Palette Pills */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono text-gray-400 block">首选提运主色系：</span>
+              <div className="flex flex-wrap gap-1.5">
+                {baziVisuals.dressingGuidance.primaryColors.map((color, cidx) => (
+                  <span
+                    key={cidx}
+                    className="text-[11px] px-2.5 py-0.5 rounded-full bg-white/10 text-white border border-white/10 font-medium"
+                  >
+                    ● {color}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1 text-xs">
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">搭配点缀：</strong>
+                <span className="ml-1 text-gray-200">{baziVisuals.dressingGuidance.accentColors.join('、')}</span>
+              </div>
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">剪裁风格：</strong>
+                <span className="ml-1 text-gray-200">{baziVisuals.dressingGuidance.clothingStyle}</span>
+              </div>
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">配饰选择：</strong>
+                <span className="ml-1 text-gray-200">{baziVisuals.dressingGuidance.accessories}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* B. 拍摄/直播间布景风格 */}
+          <div className="p-4 rounded-xl bg-[#080D18]/80 border border-white/5 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-white">
+              <Camera className="w-3.5 h-3.5 text-[#9375FF]" />
+              <span>视频背景与直播间布景 (Studio Backdrop)</span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="p-2.5 rounded-lg bg-white/5 border border-white/5">
+                <strong className="text-[#9375FF] font-mono text-[10px] block">推荐布景主题：</strong>
+                <span className="text-gray-200 font-medium leading-relaxed">{baziVisuals.studioAesthetics.backdropStyle}</span>
+              </div>
+
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">灯光色温：</strong>
+                <span className="ml-1 text-gray-200">{baziVisuals.studioAesthetics.lightingTone}</span>
+              </div>
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">空间质感：</strong>
+                <span className="ml-1 text-gray-200">{baziVisuals.studioAesthetics.materialTextures}</span>
+              </div>
+              <div className="text-gray-300">
+                <strong className="text-gray-400 font-mono text-[10px]">传递气场：</strong>
+                <span className="ml-1 text-[#38D9D0] font-medium">{baziVisuals.studioAesthetics.visualAtmosphere}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 避免雷区提示 */}
+        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <strong className="font-mono text-rose-300">⚠️ 视觉避坑：</strong>
+            <span>尽量避开大面积穿着 {baziVisuals.avoidanceAdvice.avoidColors.join('、')}。</span>
+          </div>
+          <span className="text-[11px] text-rose-300/80">{baziVisuals.avoidanceAdvice.avoidAtmosphere}</span>
+        </div>
+      </div>
+
+      {/* 4. SIMPLIFIED ESSENCE: CHARACTERISTICS & BLINDSPOTS (简单明了的特质说明) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Natural Strengths */}
         <div className="p-4 rounded-xl glass-panel space-y-2.5 border-l-4 border-l-[#38D9D0]">
@@ -205,7 +308,7 @@ export default function ReportSummaryPage() {
         </div>
       </div>
 
-      {/* 4. BRAND POSITIONING SUMMARY (一句话定位公式) */}
+      {/* 5. BRAND POSITIONING SUMMARY (一句话定位公式) */}
       {brandDNA && (
         <div className="p-4 sm:p-5 rounded-xl glass-panel space-y-2 border border-white/10">
           <div className="flex items-center justify-between text-xs">
@@ -223,7 +326,7 @@ export default function ReportSummaryPage() {
         </div>
       )}
 
-      {/* 5. RADAR & MONETIZATION SNAPSHOT */}
+      {/* 6. RADAR & 90-DAY QUICK ACTION */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Radar */}
         <div className="p-4 rounded-xl glass-panel space-y-2 flex flex-col items-center">
@@ -254,7 +357,7 @@ export default function ReportSummaryPage() {
               </div>
               <div className="p-2.5 rounded-lg bg-[#080D18]/80 border border-white/5">
                 <span className="text-[10px] text-[#38D9D0] font-mono block">31-60天：</span>
-                <span className="text-gray-200">围绕核心特质发表3篇深度干货长文，沉淀案例背书。</span>
+                <span className="text-gray-200">结合喜用神穿搭与布景录制3条标杆干货视频，沉淀背书。</span>
               </div>
               <div className="p-2.5 rounded-lg bg-[#080D18]/80 border border-white/5">
                 <span className="text-[10px] text-amber-300 font-mono block">61-90天：</span>
@@ -272,11 +375,11 @@ export default function ReportSummaryPage() {
         </div>
       </div>
 
-      {/* 6. Bottom Advisor CTA */}
+      {/* 7. Bottom Advisor CTA */}
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#121B2D] via-[#1A2540] to-[#121B2D] border border-[#9375FF]/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
         <div>
           <h4 className="text-sm font-bold text-white">想进一步根据手头资源定制变现路径？</h4>
-          <p className="text-xs text-gray-400">预约专业导师 1对1 闭门推演，逐条梳理首批高客单客户线索。</p>
+          <p className="text-xs text-gray-400">预约专业导师 1对1 闭门推演，逐条梳理首批高客单客户线索与视觉IP全案。</p>
         </div>
         <Link
           href="/consultation"
