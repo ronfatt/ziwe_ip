@@ -105,21 +105,23 @@ export default function ReportSummaryPage() {
 
       {/* 2. CORE ARCHETYPE HERO CARD: 你的核心原型 (天机星 · 首席智囊 / 商业军师) */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50/90 via-sky-50/50 to-white p-5 border border-blue-100 shadow-xs">
-        {/* Abstract 3D Crystal / Polyhedron Graphic matching user image */}
+        {/* Official Brand Logo Artwork in Report Hero */}
         <div className="absolute top-3 right-3 w-28 h-28 pointer-events-none">
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Soft glow */}
-            <div className="absolute w-20 h-20 rounded-full bg-blue-300/30 blur-md" />
-            {/* 3D Polyhedron Prism */}
-            <div className="relative w-16 h-16 flex items-center justify-center">
-              <div className="w-12 h-14 bg-gradient-to-tr from-blue-500 via-sky-400 to-indigo-300 clip-prism opacity-90 shadow-lg shadow-blue-400/30 flex items-center justify-center">
-                <div className="w-6 h-8 bg-white/40 blur-[1px]" />
-              </div>
-              {/* Floating tiny sphere accents */}
-              <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-emerald-400 shadow-xs" />
-              <div className="absolute bottom-2 -right-1 w-2.5 h-2.5 rounded-full bg-sky-400" />
-              <span className="absolute top-1 right-2 text-blue-500 text-[10px]">✦</span>
+            <div className="absolute w-20 h-20 rounded-full bg-blue-400/25 blur-md" />
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/25 border border-blue-300/40 bg-slate-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="ZIWEI IP DNA Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
+            {/* Floating tiny sphere accents */}
+            <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-emerald-400 shadow-xs" />
+            <div className="absolute bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-400" />
+            <span className="absolute top-1 right-2 text-blue-500 text-[10px]">✦</span>
           </div>
         </div>
 
@@ -516,9 +518,14 @@ export default function ReportSummaryPage() {
                 <span>天赋海报</span>
               </div>
 
-              {/* Central Graphic */}
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-500 via-sky-400 to-indigo-500 text-white flex items-center justify-center shadow-md shadow-blue-400/30">
-                <Sparkles className="w-8 h-8" />
+              {/* Central Official Logo Graphic */}
+              <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden shadow-md shadow-blue-400/30 border border-blue-200 bg-slate-950">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="ZIWEI IP DNA Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               <div>

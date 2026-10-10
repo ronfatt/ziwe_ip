@@ -48,20 +48,22 @@ export default function HomePage() {
     <div className="min-h-[calc(100vh-3.5rem)] max-w-lg md:max-w-xl mx-auto px-4 py-4 md:py-6 space-y-4">
       {/* 1. HERO BANNER: 发现你的天赋，让个人品牌发光 */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50/80 via-white to-sky-50/60 p-5 border border-blue-100/60 shadow-xs">
-        {/* Abstract 3D-inspired Orbit & Sparkle Illustration */}
-        <div className="absolute -top-1 -right-3 w-36 h-36 pointer-events-none opacity-90">
+        {/* Official Brand Logo Emblem with Orbit & Light Effects */}
+        <div className="absolute -top-1 -right-2 w-32 h-32 pointer-events-none">
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Glowing orb */}
-            <div className="absolute w-20 h-20 rounded-full bg-gradient-to-tr from-blue-400/30 via-sky-300/40 to-indigo-300/20 blur-md animate-pulse" />
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-500 opacity-80 shadow-md shadow-blue-300/40 flex items-center justify-center">
-              <div className="w-6 h-6 rounded-full bg-white/40 blur-xs" />
+            {/* Glowing ambient ring */}
+            <div className="absolute w-24 h-24 rounded-full bg-blue-500/20 blur-md animate-pulse" />
+            <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/25 border border-blue-400/30 bg-slate-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="ZIWEI IP DNA Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
-            {/* Orbit ring */}
-            <div className="absolute w-28 h-12 rounded-[50%] border-2 border-sky-300/60 rotate-[28deg]" />
-            <div className="absolute w-32 h-14 rounded-[50%] border border-blue-400/40 -rotate-[15deg]" />
             {/* Tiny stars */}
-            <span className="absolute top-3 left-6 text-amber-400 text-xs font-bold">★</span>
-            <span className="absolute bottom-2 right-4 text-blue-500 text-sm font-bold">✦</span>
+            <span className="absolute top-1 left-2 text-blue-500 text-xs font-bold">✦</span>
+            <span className="absolute bottom-2 right-1 text-indigo-400 text-xs font-bold">★</span>
           </div>
         </div>
 

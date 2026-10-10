@@ -61,11 +61,16 @@ export default function AnalyzeAnimationPage() {
         {/* Soft background glow */}
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-blue-100/60 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Dynamic 3D Spherical Orb Animation */}
+        {/* Dynamic 3D Logo Emblem Animation */}
         <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-400 via-sky-300 to-indigo-300 opacity-25 animate-ping duration-1000" />
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2563EB] via-blue-500 to-sky-400 shadow-lg shadow-blue-500/30 flex items-center justify-center text-white relative">
-            <Sparkles className="w-10 h-10 animate-spin duration-3000" />
+          <div className="absolute inset-0 rounded-3xl bg-blue-400/20 opacity-40 animate-ping duration-1000" />
+          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-950 border border-blue-400/30 shadow-xl shadow-blue-500/25 flex items-center justify-center text-white relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="ZIWEI IP DNA Logo"
+              className="w-full h-full object-cover animate-pulse"
+            />
             {starDiscovered && (
               <span className="absolute -top-1 -right-1 flex h-6 w-6">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

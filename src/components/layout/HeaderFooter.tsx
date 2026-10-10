@@ -13,10 +13,15 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
       <div className="mx-auto flex h-14 max-w-lg md:max-w-2xl items-center justify-between px-4">
-        {/* Brand Logo - Crisp Royal Blue Rounded Icon */}
+        {/* Brand Logo - Official Custom Star Emblem */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2563EB] shadow-sm shadow-blue-500/20 text-white">
-            <Sparkles className="h-4 w-4" />
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-sm shadow-blue-500/20 bg-slate-900 border border-slate-800">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="ZIWEI IP DNA Logo"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-[14px] font-black tracking-tight text-slate-900 leading-none flex items-center gap-1">
