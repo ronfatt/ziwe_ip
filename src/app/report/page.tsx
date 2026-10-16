@@ -1,76 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAssessmentStore } from '@/store/assessmentStore';
-import { FOURTEEN_STARS, DEMO_PRESETS } from '@/data/archetypes';
-import { getSimplifiedIndustryFit } from '@/data/industryFitData';
-import { calculateBaziVisualGuidance } from '@/data/baziVisuals';
+import { calculateZiweiIpDnaPreview, PreviewV01Result } from '@/lib/previewEngine';
+import { IP_FAMILIES, ELEMENT_BOOSTERS, SYSTEM_DISCLAIMER } from '@/data/previewV01Data';
 import {
   Sparkles,
-  Calendar,
-  ChevronDown,
-  CheckCircle2,
-  Bookmark,
-  Shirt,
-  Camera,
-  Target,
-  Clock,
-  ArrowRight,
   Share2,
-  Lock,
-  Flame,
-  Award,
-  Zap,
+  Calendar,
+  Compass,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
   Check,
   X,
-  Users
+  Lock,
+  Layers,
+  Crown,
+  Brain,
+  Megaphone,
+  Flame,
+  HeartHandshake,
+  Target,
+  Zap,
+  Shirt,
+  Camera,
+  Eye,
+  Star
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function ReportSummaryPage() {
-  const {
-    birthInfo,
-    activePresetId,
-    brandDNA
-  } = useAssessmentStore();
+  const { birthInfo, previewV01Result } = useAssessmentStore();
 
-  const preset = DEMO_PRESETS.find((p) => p.id === activePresetId) || DEMO_PRESETS[0];
-  const star = FOURTEEN_STARS[preset.archetypeKey] || FOURTEEN_STARS['tian_ji'];
+  // If store already has previewV01Result, use it; otherwise compute deterministically from birthInfo
+  const result: PreviewV01Result =
+    previewV01Result ||
+    calculateZiweiIpDnaPreview({
+      name: birthInfo.displayName || 'Calven',
+      gender: birthInfo.gender || 'male',
+      birthDate: birthInfo.birthDate || '1995-08-18',
+      birthTime: birthInfo.birthTime || '12:00'
+    });
 
-  // 3 Clear Industry Fits
-  const threeIndustryFits = getSimplifiedIndustryFit(preset.archetypeKey);
+  const { user, ziwei, bazi } = result;
+  const familyInfo = IP_FAMILIES[ziwei.ming_palace.ip_family_id] || IP_FAMILIES.leader_authority;
+  const boosterInfo = ELEMENT_BOOSTERS[bazi.useful_element] || ELEMENT_BOOSTERS.fire;
 
-  // Bazi Favorable Element Guidance
-  const baziVisuals = calculateBaziVisualGuidance(birthInfo.birthDate);
+  // Family Icon Dynamic Resolver
+  const getFamilyIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Crown':
+        return Crown;
+      case 'Brain':
+        return Brain;
+      case 'Megaphone':
+        return Megaphone;
+      case 'Flame':
+        return Flame;
+      case 'HeartHandshake':
+        return HeartHandshake;
+      case 'Target':
+      default:
+        return Target;
+    }
+  };
 
-  // Active Tab: 总览 | 行业方向 | 品牌定位 | 行动计划
-  const [activeTab, setActiveTab] = useState<'overview' | 'industries' | 'brand' | 'roadmap'>('industries');
-
-  // Accordion open states for the 3 industry cards
-  const [openCardIndex, setOpenCardIndex] = useState<number>(0);
-
-  // Interactive Color Swatch Selection State for Bazi Favorable Colors
-  const [selectedColorIndex, setSelectedColorIndex] = useState<number>(0);
+  const FamilyIcon = getFamilyIcon(familyInfo.iconName);
 
   // Polaroid Share Modal State
   const [showShareModal, setShowShareModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Quick Celebration Trigger
-  const triggerConfetti = () => {
+  // Quick Celebration Trigger on mount
+  useEffect(() => {
     try {
       confetti({
-        particleCount: 50,
+        particleCount: 40,
         spread: 60,
-        origin: { y: 0.7 }
+        origin: { y: 0.6 }
       });
     } catch (e) {}
-  };
+  }, []);
 
   const handleShareClick = () => {
     setShowShareModal(true);
-    triggerConfetti();
+    try {
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.7 }
+      });
+    } catch (e) {}
   };
 
   const handleCopyShare = () => {
@@ -84,33 +106,35 @@ export default function ReportSummaryPage() {
   return (
     <div className="min-h-[calc(100vh-3.5rem)] max-w-lg md:max-w-xl mx-auto px-4 py-4 md:py-6 space-y-4">
       {/* 1. TOP STATUS META BAR */}
-      <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+      <div className="flex items-center justify-between text-xs text-slate-500 font-medium pb-0.5">
         <div className="flex items-center gap-1.5">
-          <span className="font-bold text-[#2563EB]">IP DNA 探索报告</span>
+          <span className="font-bold text-[#2563EB] flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 fill-[#2563EB]" />
+            ZIWEI IP DNA
+          </span>
           <span className="text-slate-300">|</span>
-          <span className="text-slate-400 font-mono">
-            {birthInfo.displayName || '学员'} · {birthInfo.birthDate || '1995.08.18'}
+          <span className="text-slate-500 font-medium">
+            {user.name} · Preview V0.1
           </span>
         </div>
 
         {/* Action: 打开高颜值拍立得分享卡片 */}
         <button
           onClick={handleShareClick}
-          className="flex items-center gap-1 text-[11px] font-bold text-[#2563EB] hover:text-blue-700 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200/80 shadow-2xs transition active:scale-95"
+          className="flex items-center gap-1 text-[11px] font-bold text-[#2563EB] hover:text-blue-700 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200/80 shadow-2xs transition active:scale-95 cursor-pointer"
         >
           <Share2 className="w-3 h-3 text-[#2563EB]" />
           <span>生成分享海报</span>
         </button>
       </div>
 
-      {/* 2. CORE ARCHETYPE HERO CARD: 你的核心原型 (天机星 · 首席智囊 / 商业军师) */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50/90 via-sky-50/50 to-white p-5 border border-blue-100 shadow-xs">
-        {/* Official Brand Logo Artwork in Report Hero */}
-        <div className="absolute top-3 right-3 w-28 h-28 pointer-events-none">
+      {/* 2. SECTION 01 & 02 & 03: HERO BANNER - 姓名 & 六大核心 IP 家族 */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50/90 via-sky-50/60 to-white p-5 border border-blue-100/90 shadow-sm space-y-3">
+        {/* Official Brand Logo Emblem Artwork */}
+        <div className="absolute -top-1 -right-2 w-32 h-32 pointer-events-none">
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Soft glow */}
-            <div className="absolute w-20 h-20 rounded-full bg-blue-400/25 blur-md" />
-            <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/25 border border-blue-300/40 bg-slate-950">
+            <div className="absolute w-24 h-24 rounded-full bg-blue-500/15 blur-lg" />
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20 border border-blue-300/40 bg-slate-950">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo.png"
@@ -118,385 +142,341 @@ export default function ReportSummaryPage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Floating tiny sphere accents */}
-            <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-emerald-400 shadow-xs" />
-            <div className="absolute bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-400" />
-            <span className="absolute top-1 right-2 text-blue-500 text-[10px]">✦</span>
+            <span className="absolute top-1 left-2 text-blue-500 text-xs font-bold">✦</span>
           </div>
         </div>
 
-        <div className="relative z-10 max-w-[70%] space-y-2">
-          <span className="text-[11px] font-bold text-[#2563EB]">你的核心原型</span>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
-            {star.nameCn}
-          </h1>
-          <div className="text-xs font-bold text-slate-700">
-            {star.archetypeTitle}
+        <div className="relative z-10 max-w-[72%] space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#2563EB] tracking-wide">
+            <span>{user.name} 的紫微 IP DNA</span>
           </div>
 
-          {/* Trait Pills */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-100/80 text-blue-700">
-              策略思维
+          <div className="space-y-0.5">
+            <span className="text-[11px] text-slate-500 font-semibold block">
+              你的核心类型
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-100/80 text-blue-700">
-              系统构建
-            </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">
-              知识表达
-            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight flex items-center gap-2">
+              <span>{familyInfo.name}</span>
+            </h1>
           </div>
+
+          <p className="text-xs text-slate-600 font-medium leading-relaxed pt-0.5">
+            {familyInfo.tagline}
+          </p>
         </div>
 
-        {/* 预约导师 CTA Button pinned bottom-right */}
-        <div className="pt-3 flex justify-end">
-          <Link
-            href="/consultation"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2563EB] text-white text-xs font-bold shadow-xs hover:bg-blue-700 transition"
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>预约导师</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* 3. SEGMENTED TABS: 总览 | 行业方向 | 品牌定位 | 行动计划 */}
-      <div className="flex items-center justify-between border-b border-slate-200 text-xs font-semibold text-slate-500 px-2">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`pb-2.5 relative transition-colors ${activeTab === 'overview' ? 'text-[#2563EB] font-bold' : 'hover:text-slate-800'}`}
-        >
-          总览
-          {activeTab === 'overview' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB] rounded-full" />}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('industries')}
-          className={`pb-2.5 relative transition-colors ${activeTab === 'industries' ? 'text-[#2563EB] font-bold' : 'hover:text-slate-800'}`}
-        >
-          行业方向
-          {activeTab === 'industries' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB] rounded-full" />}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('brand')}
-          className={`pb-2.5 relative transition-colors ${activeTab === 'brand' ? 'text-[#2563EB] font-bold' : 'hover:text-slate-800'}`}
-        >
-          品牌定位
-          {activeTab === 'brand' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB] rounded-full" />}
-        </button>
-
-        <button
-          onClick={() => setActiveTab('roadmap')}
-          className={`pb-2.5 relative transition-colors ${activeTab === 'roadmap' ? 'text-[#2563EB] font-bold' : 'hover:text-slate-800'}`}
-        >
-          行动计划
-          {activeTab === 'roadmap' && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB] rounded-full" />}
-        </button>
-      </div>
-
-      {/* 4. TAB CONTENT: 行业方向 (MATCHING EXACT USER MOCKUP SCREENSHOT) */}
-      {activeTab === 'industries' && (
-        <div className="space-y-3.5">
-          <div>
-            <h2 className="text-sm font-black text-slate-900">
-              值得探索的 3 个事业方向
-            </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              结合你的经验与兴趣进一步验证
-            </p>
+        {/* 家族核心影响力关键词条 */}
+        <div className="pt-2 border-t border-blue-100/70">
+          <div className="text-[11px] font-semibold text-slate-500 mb-1.5 flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+            <span>你的核心影响力来自：</span>
           </div>
-
-          {/* 3 Industry Accordion Cards */}
-          <div className="space-y-3">
-            {threeIndustryFits.map((item, idx) => {
-              const isOpen = openCardIndex === idx;
-              return (
-                <div
-                  key={item.rank}
-                  className="rounded-2xl bg-white border border-slate-200/90 shadow-2xs overflow-hidden transition-all"
-                >
-                  {/* Card Header */}
-                  <div
-                    onClick={() => setOpenCardIndex(isOpen ? -1 : idx)}
-                    className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-50/80 transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* Number badge: 01, 02, 03 */}
-                      <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
-                        idx === 0 ? 'bg-emerald-50 text-emerald-600' : idx === 1 ? 'bg-blue-50 text-[#2563EB]' : 'bg-amber-50 text-amber-600'
-                      }`}>
-                        0{item.rank}
-                      </span>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900 leading-snug">
-                          {item.industryCategory}
-                        </div>
-                        <div className="text-[10px] text-slate-400 font-medium">
-                          {item.roleTitle}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {idx === 0 && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
-                          最匹配
-                        </span>
-                      )}
-                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                    </div>
-                  </div>
-
-                  {/* Expanded Body Details */}
-                  {isOpen && (
-                    <div className="px-3.5 pb-3.5 pt-1 space-y-2.5 border-t border-slate-100 text-xs">
-                      <p className="text-slate-600 text-[11px] leading-relaxed">
-                        {item.coreTrait}
-                      </p>
-
-                      {/* 可开展的业务方向 */}
-                      <div className="space-y-1">
-                        <span className="text-[10px] text-slate-400 block font-medium">可开展的业务方向：</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {item.suitableDoing.map((action, aidx) => (
-                            <span
-                              key={aidx}
-                              className="text-[10px] font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-700"
-                            >
-                              {action}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* 变现路径 */}
-                      <div className="p-2 rounded-lg bg-emerald-50/70 border border-emerald-100 flex items-center gap-2 text-[11px] text-emerald-900">
-                        <span className="font-bold text-emerald-700">变现路径</span>
-                        <span className="text-emerald-400">|</span>
-                        <span>{item.monetizationPath}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bottom Footnote Tip */}
-          <div className="text-[10px] text-slate-400 flex items-center gap-1 pt-1">
-            <span>ⓘ 探索建议仅供参考，职业选择需结合实际能力与市场验证。</span>
-          </div>
-        </div>
-      )}
-
-      {/* 5. TAB CONTENT: 品牌定位 (BRAND & BAZI VISUALS - WITH INTERACTIVE COLOR PALETTE) */}
-      {activeTab === 'brand' && (
-        <div className="space-y-3.5 animate-fadeIn">
-          <div>
-            <h2 className="text-sm font-black text-slate-900">个人品牌与定位策略</h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">确立你的核心差异化价值</p>
-          </div>
-
-          {/* Positioning Formula Card */}
-          {brandDNA && (
-            <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-2">
-              <span className="text-[10px] font-bold text-[#2563EB] uppercase">一句话品牌定位公式</span>
-              <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-slate-800 font-medium leading-relaxed">
-                &ldquo;{brandDNA.positioningStatement}&rdquo;
-              </div>
-            </div>
-          )}
-
-          {/* BAZI VISUAL STYLING ENGINE: 交互式换色穿搭灵感 */}
-          <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
-                <Shirt className="w-4 h-4 text-[#2563EB]" />
-                <h3 className="text-xs font-bold text-slate-900">
-                  八字喜用神交互穿搭 (点击色块试穿)
-                </h3>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-[#2563EB]">
-                喜用 {baziVisuals.elementNameCn}
+          <div className="flex flex-wrap gap-1.5">
+            {familyInfo.keywords.map((kw, i) => (
+              <span
+                key={i}
+                className="text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-white border border-blue-200/70 text-slate-800 shadow-2xs"
+              >
+                {kw}
               </span>
-            </div>
-
-            {/* Interactive Color Chips Switcher */}
-            <div className="space-y-2 text-xs">
-              <div>
-                <span className="text-[10px] text-slate-400 block mb-1.5">
-                  点击探索适合你的开运穿搭主色（提升公众信任）：
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {baziVisuals.dressingGuidance.primaryColors.map((color, idx) => {
-                    const isSelected = selectedColorIndex === idx;
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setSelectedColorIndex(idx)}
-                        className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-xs scale-105'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-[#2563EB]'}`} />
-                        <span>{color}</span>
-                        {isSelected && <span className="text-[9px]">★</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Live Dress Feedback Box based on selected color */}
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1">
-                <div className="text-[11px] text-slate-700 font-medium">
-                  <strong>当前选中：</strong>
-                  <span className="text-[#2563EB] font-bold ml-1">
-                    {baziVisuals.dressingGuidance.primaryColors[selectedColorIndex] || '主打色'}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 leading-relaxed">
-                  搭配建议：内搭或领口点缀 <strong>{baziVisuals.dressingGuidance.accentColors.join(' / ')}</strong>，材质选择 <strong>{baziVisuals.dressingGuidance.clothingStyle}</strong>，气场更加舒展自信。
-                </p>
-              </div>
-
-              <div className="text-[11px] text-slate-600 pt-1">
-                <strong className="text-slate-400">视频/直播布景：</strong> {baziVisuals.studioAesthetics.backdropStyle}
-              </div>
-
-              <div className="text-[11px] text-slate-600">
-                <strong className="text-slate-400">视觉气场：</strong> {baziVisuals.studioAesthetics.visualAtmosphere}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* 6. TAB CONTENT: 总览 (OVERVIEW) */}
-      {activeTab === 'overview' && (
-        <div className="space-y-3 animate-fadeIn text-xs">
-          <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-2">
-            <h3 className="text-xs font-bold text-slate-900">天赋优势底牌</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {star.strengths.map((str, idx) => (
-                <span key={idx} className="px-2 py-1 rounded-md bg-blue-50 text-[#2563EB] text-[11px] font-medium">
-                  ✓ {str}
-                </span>
-              ))}
+      {/* 3. SECTION 04, 05, 06: 你的命宫 (核心特质与优势原型 / “我是谁”) */}
+      <div className="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold text-xs">
+              命
+            </div>
+            <div>
+              <h2 className="text-sm font-black text-slate-900">你的命宫</h2>
+              <span className="text-[10px] text-slate-400">决定你的 IP 内核 · 我是谁</span>
             </div>
           </div>
-
-          <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-2">
-            <h3 className="text-xs font-bold text-slate-900">潜意识盲区防范</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {star.blindSpots.map((b, idx) => (
-                <span key={idx} className="px-2 py-1 rounded-md bg-rose-50 text-rose-600 text-[11px] font-medium">
-                  ! {b}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 7. TAB CONTENT: 行动计划 (ROADMAP) */}
-      {activeTab === 'roadmap' && (
-        <div className="space-y-3 animate-fadeIn text-xs">
-          <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-2.5">
-            <h3 className="text-xs font-bold text-slate-900">90 天阶段冲刺建议</h3>
-            <div className="space-y-2">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                <span className="text-[10px] font-bold text-[#2563EB] block">第 1 - 30 天：定位打磨</span>
-                <p className="text-[11px] text-slate-600 mt-0.5">明确单点业务方案，完成前2位种子客户的交付与口碑收集。</p>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                <span className="text-[10px] font-bold text-emerald-600 block">第 31 - 60 天：内容与信任</span>
-                <p className="text-[11px] text-slate-600 mt-0.5">围绕核心特质发表3篇标杆深度干货，建立公信力。</p>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                <span className="text-[10px] font-bold text-amber-600 block">第 61 - 90 天：商业化变现</span>
-                <p className="text-[11px] text-slate-600 mt-0.5">正式推出高客单闭门咨询/小班营，跑通正向现金流。</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 8. 转化心机：好奇心缺口锁扣卡片 (CURIOSITY GAP CARD - 激发预约冲动) */}
-      <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-5 text-white border border-slate-800 shadow-lg relative overflow-hidden space-y-3">
-        {/* Glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl" />
-
-        <div className="flex items-center justify-between pb-2 border-b border-white/10">
-          <div className="flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span className="text-xs font-black tracking-wide text-amber-300">
-              你的深度命局进阶破局卡
-            </span>
-          </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
-            仅限导师一对一解读
+          <span className="text-[11px] font-bold text-[#2563EB] bg-blue-50 px-2.5 py-0.5 rounded-md">
+            核心特质
           </span>
         </div>
 
-        {/* 2 Blurred Teasers */}
-        <div className="space-y-2">
-          {/* Teaser 1 */}
-          <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>命盘暗雷解密：为何你在商业推进中总有决策犹豫内耗？</span>
-              </div>
-              <div className="text-[10px] text-slate-400 blur-[2px] select-none">
-                星盘财帛与官禄宫受化忌暗星干扰，易亲力亲为劳损，需用特定合伙机制化解。
-              </div>
+        {/* 主星与原型展示 */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-white border border-blue-100/80 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-slate-500 font-semibold mb-0.5">
+              命宫主星：
+              <span className="text-slate-900 font-bold ml-1">
+                {ziwei.ming_palace.stars.join(' · ')}
+              </span>
             </div>
-            <span className="text-[10px] font-bold text-amber-400 shrink-0 ml-2">解锁 →</span>
+            <div className="text-lg font-black text-slate-900 flex items-center gap-2">
+              <span>{ziwei.ming_palace.archetype}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white font-bold">
+                {ziwei.ming_palace.ip_family}
+              </span>
+            </div>
           </div>
-
-          {/* Teaser 2 */}
-          <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-[#38D9D0] shrink-0" />
-                <span>2026-2027 三年大限爆发点与命定贵人方位</span>
-              </div>
-              <div className="text-[10px] text-slate-400 blur-[2px] select-none">
-                太阳化科入迁移大运，利于异地或新媒体出海发声，下半年有核心贵人助力。
-              </div>
-            </div>
-            <span className="text-[10px] font-bold text-[#38D9D0] shrink-0 ml-2">解锁 →</span>
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+            <FamilyIcon className="w-5 h-5" />
           </div>
         </div>
 
-        {/* Advisor Urgency Banner */}
-        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/10">
+        {/* 核心优势 Point Form */}
+        <div className="space-y-2 pt-1">
+          <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+            你的核心优势：
+          </span>
+          <div className="space-y-1.5">
+            {ziwei.ming_palace.core_advantages.map((point, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-2 text-xs text-slate-700 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100"
+              >
+                <span className="text-[#2563EB] font-black shrink-0 mt-0.5">✦</span>
+                <span className="font-medium leading-relaxed">{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 4. SECTION 07, 08, 09: 你的迁移宫 (公众感知 / 外显人格 / “别人怎么看我”) */}
+      <div className="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center font-bold text-white text-xs shadow-xs">
-              导师
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+              迁
             </div>
             <div>
-              <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>资深 IP 战略咨询操盘导师</span>
-                <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400 text-black font-black">认证</span>
+              <h2 className="text-sm font-black text-slate-900">你的迁移宫</h2>
+              <span className="text-[10px] text-slate-400">决定你的 IP 外显 · 别人怎么看我</span>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">
+            公众感知
+          </span>
+        </div>
+
+        {/* 迁移主星与外显原型 */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-indigo-50/70 via-purple-50/40 to-white border border-indigo-100/80 flex items-center justify-between">
+          <div>
+            <div className="text-xs text-slate-500 font-semibold mb-0.5">
+              迁移宫主星：
+              <span className="text-slate-900 font-bold ml-1">
+                {ziwei.migration_palace.stars.join(' · ')}
+              </span>
+            </div>
+            <div className="text-lg font-black text-slate-900">
+              {ziwei.migration_palace.archetype}
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+            <Eye className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* 市场如何看你 */}
+        <div className="space-y-2 pt-1">
+          <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+            <Target className="w-3.5 h-3.5 text-indigo-600" />
+            市场比较容易先看到你的：
+          </span>
+          <div className="grid grid-cols-2 gap-1.5 pb-1">
+            {ziwei.migration_palace.keywords.map((kw, i) => (
+              <div
+                key={i}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-indigo-50/60 border border-indigo-100/80 text-indigo-950 flex items-center gap-1.5"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <span>{kw}</span>
               </div>
-              <div className="text-[10px] text-slate-400">已指导 320+ 位创始人及超级个体跑通闭环</div>
+            ))}
+          </div>
+
+          {ziwei.migration_palace.external_perception && (
+            <div className="space-y-1.5 pt-1">
+              {ziwei.migration_palace.external_perception.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-2 text-xs text-slate-600 bg-slate-50/80 px-3 py-2 rounded-xl border border-slate-100"
+                >
+                  <span className="text-indigo-500 font-bold shrink-0 mt-0.5">•</span>
+                  <span className="font-medium leading-relaxed">{item}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 5. SECTION 10: 命宫 × 迁移宫一句话总结 (The Core IP DNA Collision) */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 shadow-lg border border-slate-800 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-[10px] font-bold text-blue-300">
+            <Sparkles className="w-3 h-3 text-amber-300 fill-amber-300" />
+            命宫 × 迁移宫 · 专属碰撞总结
+          </span>
+          <span className="text-[10px] font-mono text-slate-400">IP DNA SYNTHESIS</span>
+        </div>
+
+        <h3 className="text-lg font-black text-white leading-snug tracking-tight">
+          {ziwei.collision_summary.split('。')[0]}。
+        </h3>
+
+        <div className="p-3.5 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200 leading-relaxed font-normal space-y-2">
+          <p>{ziwei.collision_summary}</p>
+          <div className="pt-2 border-t border-white/10 text-amber-300 font-bold text-xs flex items-center gap-1">
+            <span>💡 专家指引：</span>
+            <span>{familyInfo.oneLiner}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. SECTION 11, 12, 13: 八字日柱与品牌能量放大器 (五行 IP Booster) */}
+      <div className="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+              气
+            </div>
+            <div>
+              <h2 className="text-sm font-black text-slate-900">八字日柱与能量放大器</h2>
+              <span className="text-[10px] text-slate-400">五行喜用神 IP Booster</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
+            <span>日柱：</span>
+            <span className="text-[#2563EB]">{bazi.day_pillar}</span>
+          </div>
+        </div>
+
+        {/* 喜用神放大器 Banner */}
+        <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-white border border-amber-200/70 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-medium">喜用神：</span>
+              <span className="text-xl font-black text-amber-600">
+                {bazi.useful_element_name}（{bazi.ip_booster.boost}）
+              </span>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+              品牌加速器
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-700 font-medium leading-relaxed">
+            {bazi.ip_booster.copy}
+          </p>
+
+          <div className="p-2.5 rounded-lg bg-white/90 border border-amber-100 text-xs font-bold text-slate-800">
+            👉 {bazi.ip_booster.one_liner}
+          </div>
+        </div>
+
+        {/* 视觉建议：穿搭色彩 & 布景风格 */}
+        <div className="grid grid-cols-2 gap-2.5 pt-1">
+          {/* 建议强化色彩 */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+              <Shirt className="w-3.5 h-3.5 text-amber-600" />
+              <span>适合品牌色/穿搭</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {bazi.ip_booster.outfit_colors.map((c, i) => (
+                <span
+                  key={i}
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700"
+                >
+                  {c}
+                </span>
+              ))}
             </div>
           </div>
 
+          {/* 建议拍摄布景 */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+              <Camera className="w-3.5 h-3.5 text-indigo-600" />
+              <span>镜头布景风格</span>
+            </div>
+            <p className="text-[10px] text-slate-600 leading-tight">
+              {bazi.ip_booster.backdrop_style}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 7. SECTION 14 & 36: 结尾引流 CTA - 解锁完整版 / 预约导师 */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-5 sm:p-6 border border-slate-800 shadow-xl space-y-4">
+        {/* Soft Background Radial */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/30 text-[10px] font-bold text-amber-300">
+            <span>✨ 试听课进阶专享通道</span>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
+            这只是你的第一层 IP DNA
+          </h2>
+
+          <p className="text-xs text-slate-300 leading-relaxed font-normal">
+            真正完整的个人 IP，并不是只看一颗主星。
+            完整版《紫微 IP DNA 战略系统》还会继续深度拆解：
+          </p>
+        </div>
+
+        {/* 完整版进阶 8 大维度标签 */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] font-semibold text-slate-200">
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 核心人格深层动机
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 官禄宫 · 商业价值
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 财帛宫 · 变现路径
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 身宫 · 人生后半场
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 三方四正 · 资源格局
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 生年/命宫四化暗线
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 客群画像与收费定价
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+            🔒 2026-2027 爆发大限
+          </div>
+        </div>
+
+        {/* 预约导师闭门沟通 CTA */}
+        <div className="pt-2 flex flex-col gap-2.5 border-t border-white/10">
           <Link
             href="/consultation"
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 text-white font-bold text-xs shadow-md shadow-blue-500/30 text-center hover:opacity-95 transition flex items-center justify-center gap-1"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:opacity-95 active:scale-[0.99] text-white font-bold text-xs sm:text-sm text-center shadow-lg shadow-blue-500/30 transition flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>预约导师闭门破局 (今日余2席)</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>解锁我的完整 IP DNA · 预约导师 1对1 破局</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
+
+          <p className="text-center text-[10px] text-slate-400">
+            针对试听课学员开放限量一对一定制咨询席位
+          </p>
         </div>
+      </div>
+
+      {/* 8. SECTION 15 & 42: 系统免责声明 */}
+      <div className="rounded-xl bg-slate-50 border border-slate-200/70 p-3.5 text-center">
+        <p className="text-[10px] text-slate-400 leading-relaxed">
+          {SYSTEM_DISCLAIMER}
+        </p>
       </div>
 
       {/* 9. POLAROID SHARE CARD MODAL (高颜值拍立得海报分享弹窗) */}
@@ -506,7 +486,7 @@ export default function ReportSummaryPage() {
             {/* Close Button */}
             <button
               onClick={() => setShowShareModal(false)}
-              className="absolute top-3 right-3 p-1 rounded-full text-slate-400 hover:text-slate-600 bg-slate-100"
+              className="absolute top-3 right-3 p-1 rounded-full text-slate-400 hover:text-slate-600 bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -529,21 +509,29 @@ export default function ReportSummaryPage() {
               </div>
 
               <div>
-                <span className="text-[10px] text-slate-400 block font-medium">我的核心事业原型</span>
-                <h3 className="text-xl font-black text-slate-900">{star.nameCn}</h3>
-                <p className="text-xs font-bold text-[#2563EB]">{star.archetypeTitle}</p>
+                <span className="text-[10px] text-slate-400 block font-medium">
+                  {user.name} 的核心 IP 原型
+                </span>
+                <h3 className="text-xl font-black text-slate-900">
+                  {familyInfo.name}
+                </h3>
+                <p className="text-xs font-bold text-[#2563EB]">
+                  {ziwei.ming_palace.archetype}
+                </p>
               </div>
 
-              {/* 3 Industry Tags */}
-              <div className="space-y-1 pt-1 border-t border-slate-100 text-left">
-                <span className="text-[9px] text-slate-400 block font-semibold">首要事业定位赛道：</span>
-                <div className="flex flex-wrap gap-1">
-                  {threeIndustryFits.map((fit, idx) => (
-                    <span key={idx} className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-100/70 text-blue-800">
-                      #{fit.industryCategory.split('与')[0]}
-                    </span>
-                  ))}
-                </div>
+              {/* 核心碰撞一句话 */}
+              <div className="p-2 rounded-lg bg-blue-50/60 border border-blue-100 text-left text-[10px] text-slate-700 leading-snug">
+                <span className="font-bold text-[#2563EB]">命宫 × 迁移宫：</span>
+                <span>{ziwei.collision_summary.split('。')[0]}。</span>
+              </div>
+
+              {/* 五行放大器 */}
+              <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+                <span>日柱：{bazi.day_pillar}</span>
+                <span className="font-bold text-amber-600">
+                  喜用神：{bazi.useful_element_name}（{bazi.ip_booster.boost}）
+                </span>
               </div>
 
               {/* QR Code Demo Placeholder */}
@@ -559,7 +547,7 @@ export default function ReportSummaryPage() {
             <div className="space-y-2 pt-1">
               <button
                 onClick={handleCopyShare}
-                className="w-full py-2.5 rounded-xl bg-[#2563EB] text-white font-bold text-xs shadow-sm hover:bg-blue-700 transition flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 rounded-xl bg-[#2563EB] text-white font-bold text-xs shadow-sm hover:bg-blue-700 transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 {copiedLink ? (
                   <>
@@ -573,7 +561,7 @@ export default function ReportSummaryPage() {
                   </>
                 )}
               </button>
-              <p className="text-[10px] text-slate-400">手机端可长按或截屏上方卡片保存至相册</p>
+              <p className="text-[10px] text-slate-400">手机端可截屏上方卡片保存至相册发朋友圈</p>
             </div>
           </div>
         </div>

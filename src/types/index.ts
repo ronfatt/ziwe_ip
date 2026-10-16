@@ -207,4 +207,8 @@ export interface AssessmentState {
   brandDNA?: PersonalBrandDNAOutput;
   businessDNA?: BusinessDNAOutput;
   roadmap?: RoadmapOutput;
+  previewV01Result?: any;
 }
+
+export * from '@/data/previewV01Data';
+export type { PreviewV01Result, PreviewEngineInput } from '@/lib/previewEngine';

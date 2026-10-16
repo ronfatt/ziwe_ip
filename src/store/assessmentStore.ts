@@ -14,6 +14,7 @@ import {
   synthesizeBusinessDNA,
   synthesizeRoadmap
 } from '@/lib/scoring';
+import { calculateZiweiIpDnaPreview } from '@/lib/previewEngine';
 
 const INITIAL_BIRTH_INFO: BirthInfo = {
   displayName: '林奕凡 Evan',
@@ -100,7 +101,13 @@ const getInitialState = (): AssessmentState => {
     careerDNA: synthesizeCareerDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
     brandDNA: synthesizeBrandDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
     businessDNA: synthesizeBusinessDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
-    roadmap: synthesizeRoadmap(INITIAL_PROFILE, preset.archetypeKey)
+    roadmap: synthesizeRoadmap(INITIAL_PROFILE, preset.archetypeKey),
+    previewV01Result: calculateZiweiIpDnaPreview({
+      name: INITIAL_BIRTH_INFO.displayName,
+      gender: INITIAL_BIRTH_INFO.gender,
+      birthDate: INITIAL_BIRTH_INFO.birthDate,
+      birthTime: INITIAL_BIRTH_INFO.birthTime
+    })
   };
 };
 
@@ -168,12 +175,20 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
     const businessDNA = synthesizeBusinessDNA(state.profile, scores, preset.archetypeKey);
     const roadmap = synthesizeRoadmap(state.profile, preset.archetypeKey);
 
+    const previewV01Result = calculateZiweiIpDnaPreview({
+      name: state.birthInfo.displayName,
+      gender: state.birthInfo.gender,
+      birthDate: state.birthInfo.birthDate,
+      birthTime: state.birthInfo.birthTime
+    });
+
     set({
       computedScores: scores,
       careerDNA,
       brandDNA,
       businessDNA,
-      roadmap
+      roadmap,
+      previewV01Result
     });
 
     if (typeof window !== 'undefined') {
@@ -217,13 +232,21 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
       careerDNA: undefined,
       brandDNA: undefined,
       businessDNA: undefined,
-      roadmap: undefined
+      roadmap: undefined,
+      previewV01Result: undefined
     });
   },
 
   loadDemoSeed: () => {
     const defaultScores = calculateQuizScores(DEFAULT_QUIZ_ANSWERS);
     const preset = DEMO_PRESETS[0];
+    const previewV01Result = calculateZiweiIpDnaPreview({
+      name: INITIAL_BIRTH_INFO.displayName,
+      gender: INITIAL_BIRTH_INFO.gender,
+      birthDate: INITIAL_BIRTH_INFO.birthDate,
+      birthTime: INITIAL_BIRTH_INFO.birthTime
+    });
+
     const newState = {
       currentStep: 4,
       birthInfo: INITIAL_BIRTH_INFO,
@@ -235,7 +258,8 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
       careerDNA: synthesizeCareerDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
       brandDNA: synthesizeBrandDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
       businessDNA: synthesizeBusinessDNA(INITIAL_PROFILE, defaultScores, preset.archetypeKey),
-      roadmap: synthesizeRoadmap(INITIAL_PROFILE, preset.archetypeKey)
+      roadmap: synthesizeRoadmap(INITIAL_PROFILE, preset.archetypeKey),
+      previewV01Result
     };
     set(newState);
     if (typeof window !== 'undefined') {
@@ -276,6 +300,13 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
     const businessDNA = synthesizeBusinessDNA(updatedProfile, scores, selectedPreset.archetypeKey);
     const roadmap = synthesizeRoadmap(updatedProfile, selectedPreset.archetypeKey);
 
+    const previewV01Result = calculateZiweiIpDnaPreview({
+      name: updatedBirthInfo.displayName,
+      gender: updatedBirthInfo.gender,
+      birthDate: updatedBirthInfo.birthDate,
+      birthTime: updatedBirthInfo.birthTime
+    });
+
     set({
       currentStep: 4,
       birthInfo: updatedBirthInfo,
@@ -285,7 +316,8 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
       careerDNA,
       brandDNA,
       businessDNA,
-      roadmap
+      roadmap,
+      previewV01Result
     });
 
     if (typeof window !== 'undefined') {

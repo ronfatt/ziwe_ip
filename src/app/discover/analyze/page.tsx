@@ -9,7 +9,7 @@ import confetti from 'canvas-confetti';
 export default function AnalyzeAnimationPage() {
   const router = useRouter();
   const { runAnalysis, activePresetId } = useAssessmentStore();
-  const [currentStepText, setCurrentStepText] = useState('校准出生时辰天干地支坐标...');
+  const [currentStepText, setCurrentStepText] = useState('正在校准出生干支与八字日柱坐标...');
   const [starDiscovered, setStarDiscovered] = useState(false);
   const [progress, setProgress] = useState(20);
 
@@ -17,19 +17,19 @@ export default function AnalyzeAnimationPage() {
     runAnalysis();
 
     const t1 = setTimeout(() => {
-      setProgress(48);
-      setCurrentStepText('深度解析紫微命宫、官禄宫与财帛宫星曜格局...');
-    }, 700);
+      setProgress(45);
+      setCurrentStepText('正在读取紫微命宫主星与对宫迁移宫原型...');
+    }, 600);
 
     const t2 = setTimeout(() => {
-      setProgress(78);
-      setCurrentStepText('计算八字五行生克与个人气场调候喜用神...');
-    }, 1500);
+      setProgress(72);
+      setCurrentStepText('正在匹配六大核心 IP 家族与优势原型...');
+    }, 1300);
 
     const t3 = setTimeout(() => {
-      setProgress(95);
+      setProgress(92);
       setStarDiscovered(true);
-      setCurrentStepText('恭喜！命中核心高潜原型，正在生成 IP DNA 报告...');
+      setCurrentStepText('计算八字喜用神，激活五行 IP 能量放大器...');
       // Fire celebratory confetti!
       try {
         confetti({
@@ -40,7 +40,7 @@ export default function AnalyzeAnimationPage() {
       } catch (e) {
         // Fallback gracefully
       }
-    }, 2300);
+    }, 2000);
 
     const t4 = setTimeout(() => {
       setProgress(100);

@@ -27,8 +27,8 @@ export const Navbar = () => {
             <span className="text-[14px] font-black tracking-tight text-slate-900 leading-none flex items-center gap-1">
               ZIWEI IP DNA<span className="text-[10px] text-[#2563EB] font-mono">™</span>
             </span>
-            <span className="text-[9px] text-slate-400 font-bold tracking-wider mt-0.5 uppercase">
-              Career Intelligence
+            <span className="text-[9px] text-[#2563EB] font-bold tracking-wider mt-0.5 uppercase">
+              Strategic System · Preview V0.1
             </span>
           </div>
         </Link>
