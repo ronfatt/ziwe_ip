@@ -42,6 +42,14 @@ describe('紫微 IP DNA 战略系统｜引流测试版 Preview V0.1 Engine Tests
     expect(result.bazi.ip_booster.boost).toBeDefined();
     expect(result.bazi.ip_booster.keywords.length).toBeGreaterThanOrEqual(3);
     expect(result.bazi.ip_booster.outfit_colors.length).toBeGreaterThanOrEqual(3);
+
+    // 14 真实农历与南派排盘特有字段
+    expect(result.user.lunar_date_str).toContain('农历');
+    expect(result.ziwei.ming_palace.bureau_name).toBeDefined();
+    expect(result.ziwei.ming_palace.palace_pillar).toBeDefined();
+    expect(result.ziwei.shen_palace.name).toBeDefined();
+    expect(result.ziwei.shen_palace.meaning).toBeDefined();
+    expect(result.ziwei.mutagen_insight).toBeDefined();
   });
 
   it('validates all 6 IP Families integrity per spec Section 12-17', () => {

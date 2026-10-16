@@ -1,6 +1,6 @@
 // ==========================================
 // 紫微 IP DNA 战略系统｜引流测试版 / Preview Test Version V0.1
-// 统一排盘与推演计算引擎 (Section 7, 11, 37)
+// 专业统一排盘与推演计算引擎 (深度融合大耕老师南派紫微斗数与八字喜用神)
 // ==========================================
 
 import {
@@ -12,12 +12,10 @@ import {
   ELEMENT_BOOSTERS,
   getElementBoosterSummary
 } from '@/data/previewV01Data';
+import { calculateRealZiweiChart, ZiweiRealChartOutput } from './ziweiRealEngine';
+import { EARTHLY_BRANCHES } from './lunarCalendar';
 
-// 天干地支常量定义
-const HEAVENLY_STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-const EARTHLY_BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-
-// 五行映射
+// 五行映射字典
 const STEM_ELEMENTS: Record<string, ElementKey> = {
   甲: 'wood',
   乙: 'wood',
@@ -39,18 +37,6 @@ export interface PreviewEngineInput {
   timezone?: string;
 }
 
-export interface PalaceResult {
-  stars: string[];
-  combination_id?: string;
-  archetype: string;
-  ip_family: string;
-  ip_family_id: IPFamilyId;
-  keywords: string[];
-  core_advantages?: string[];
-  external_perception?: string[];
-  explanation: string;
-}
-
 export interface PreviewV01Result {
   user: {
     name: string;
@@ -58,31 +44,50 @@ export interface PreviewV01Result {
     birth_date: string;
     birth_time: string;
     timezone: string;
+    lunar_date_str: string;
   };
   ziwei: {
     ming_palace: {
       stars: string[];
+      is_empty: boolean;
+      borrowed_from_migration?: boolean;
+      palace_branch: string;
+      palace_stem: string;
+      palace_pillar: string;
+      bureau_name: string;
       combination_id?: string;
       archetype: string;
       ip_family: string;
       ip_family_id: IPFamilyId;
       keywords: string[];
       core_advantages: string[];
+      mutagens: string[];
       explanation: string;
     };
     migration_palace: {
       stars: string[];
+      is_empty: boolean;
+      palace_branch: string;
       combination_id?: string;
       archetype: string;
       keywords: string[];
       external_perception: string[];
+      mutagens: string[];
       explanation: string;
+    };
+    shen_palace: {
+      name: string;
+      meaning: string;
     };
     collision_summary: string;
     core_one_liner: string;
+    mutagen_insight: string;
   };
   bazi: {
     day_pillar: string;
+    year_pillar: string;
+    month_pillar: string;
+    hour_pillar: string;
     useful_element: ElementKey;
     useful_element_name: string;
     ip_booster: {
@@ -99,58 +104,9 @@ export interface PreviewV01Result {
 }
 
 /**
- * 计算公历日期的基准干支（日柱）
- */
-function calculateDayPillar(year: number, month: number, day: number): string {
-  // 基于儒略日公历算法推算日柱天干地支
-  const a = Math.floor((14 - month) / 12);
-  const y = year + 4800 - a;
-  const m = month + 12 * a - 3;
-  const jdn =
-    day +
-    Math.floor((153 * m + 2) / 5) +
-    365 * y +
-    Math.floor(y / 4) -
-    Math.floor(y / 100) +
-    Math.floor(y / 400) -
-    32045;
-
-  // 儒略日与天干地支对应关系 (JDN + 49) % 60
-  const stemIdx = (jdn + 49) % 10;
-  const branchIdx = (jdn + 49) % 12;
-
-  return `${HEAVENLY_STEMS[stemIdx]}${EARTHLY_BRANCHES[branchIdx]}`;
-}
-
-/**
- * 确定时辰对应的地支索引 (子=0, 丑=1, ..., 亥=11)
- */
-function getHourBranchIndex(timeStr: string = '12:00'): number {
-  if (!timeStr || !timeStr.includes(':')) return 6; // 默认午时 (11:00-13:00)
-  const [hStr, mStr] = timeStr.split(':');
-  const hour = parseInt(hStr, 10);
-  const minute = parseInt(mStr || '0', 10);
-  const totalMin = hour * 60 + minute;
-
-  // 23:00 - 01:00 为子时
-  if (totalMin >= 23 * 60 || totalMin < 1 * 60) return 0; // 子
-  if (totalMin < 3 * 60) return 1; // 丑
-  if (totalMin < 5 * 60) return 2; // 寅
-  if (totalMin < 7 * 60) return 3; // 卯
-  if (totalMin < 9 * 60) return 4; // 辰
-  if (totalMin < 11 * 60) return 5; // 巳
-  if (totalMin < 13 * 60) return 6; // 午
-  if (totalMin < 15 * 60) return 7; // 未
-  if (totalMin < 17 * 60) return 8; // 申
-  if (totalMin < 19 * 60) return 9; // 酉
-  if (totalMin < 21 * 60) return 10; // 戌
-  return 11; // 亥
-}
-
-/**
  * 智能双星或单星匹配器
  */
-function matchStarCombination(star1: string, star2?: string): {
+function matchStarCombination(star1?: string, star2?: string): {
   combinationId?: string;
   archetype: string;
   ipFamilyId: IPFamilyId;
@@ -159,47 +115,84 @@ function matchStarCombination(star1: string, star2?: string): {
   externalPerception: string[];
   collisionSummary?: string;
 } {
-  // 如果有两颗星，尝试匹配24组双星组合
-  if (star2 && star1 !== star2) {
-    const pinyinMap: Record<string, string> = {
-      紫微: 'ziwei',
-      贪狼: 'tanlang',
-      天府: 'tianfu',
-      天相: 'tianxiang',
-      七杀: 'qisha',
-      破军: 'pojun',
-      天机: 'tianji',
-      太阴: 'taiyin',
-      巨门: 'jumen',
-      天梁: 'tianliang',
-      太阳: 'taiyang',
-      武曲: 'wuqu',
-      天同: 'tiantong',
-      廉贞: 'lianzhen'
+  if (!star1 && !star2) {
+    // 命无主星 fallback
+    return {
+      combinationId: 'empty_palace',
+      archetype: '全维适应型',
+      ipFamilyId: 'strategy_intelligence',
+      keywords: ['可塑', '敏锐', '借势', '连接'],
+      coreAdvantages: [
+        '如水般具备极高变通力，善于随市场变化快速调优',
+        '没有固有的人设包袱，能够极其灵敏地捕捉用户需求',
+        '擅长借力打力，整合行业头部势能成就自身品牌',
+        '适合打造跨界连接者、生态操盘手或高价值赋能者IP'
+      ],
+      externalPerception: [
+        '市场感知你灵活、谦和、具有极高包容性与适应度',
+        '在公众平台能随和地融入不同圈层，毫无距离感',
+        '受众容易将自己的诉求投射于你，产生共创感'
+      ],
+      collisionSummary: '命无主星借对宫，天下莫柔弱于水，而攻坚强者莫之能胜。你的IP定位不必刻意固化，借势赋能即是你的最强护城河。'
     };
+  }
 
-    const py1 = pinyinMap[star1];
-    const py2 = pinyinMap[star2];
-    if (py1 && py2) {
-      const keyA = `${py1}_${py2}`;
-      const keyB = `${py2}_${py1}`;
-      const dualMatch = DUAL_STAR_ARCHETYPES[keyA] || DUAL_STAR_ARCHETYPES[keyB];
-      if (dualMatch) {
-        return {
-          combinationId: dualMatch.id,
-          archetype: dualMatch.archetype,
-          ipFamilyId: dualMatch.ipFamily,
-          keywords: dualMatch.keywords,
-          coreAdvantages: dualMatch.coreAdvantages,
-          externalPerception: dualMatch.externalPerception,
-          collisionSummary: dualMatch.collisionSummary
-        };
-      }
+  // 单星
+  if (!star2 || star1 === star2) {
+    const sName = star1 || star2 || '紫微';
+    const single = FOURTEEN_STAR_LABELS[sName] || FOURTEEN_STAR_LABELS['紫微'];
+    return {
+      combinationId: sName,
+      archetype: single.singleArchetype,
+      ipFamilyId: single.defaultFamily,
+      keywords: single.tags,
+      coreAdvantages: single.coreAdvantagePoints,
+      externalPerception: single.externalPerception,
+      collisionSummary: undefined
+    };
+  }
+
+  // 双星
+  const pinyinMap: Record<string, string> = {
+    紫微: 'ziwei',
+    贪狼: 'tanlang',
+    天府: 'tianfu',
+    天相: 'tianxiang',
+    七杀: 'qisha',
+    破军: 'pojun',
+    天机: 'tianji',
+    太阴: 'taiyin',
+    巨门: 'jumen',
+    天梁: 'tianliang',
+    太阳: 'taiyang',
+    武曲: 'wuqu',
+    天同: 'tiantong',
+    廉贞: 'lianzhen'
+  };
+
+  const s1 = star1 || '紫微';
+  const s2 = star2 || '';
+  const py1 = pinyinMap[s1];
+  const py2 = pinyinMap[s2];
+  if (py1 && py2) {
+    const keyA = `${py1}_${py2}`;
+    const keyB = `${py2}_${py1}`;
+    const dualMatch = DUAL_STAR_ARCHETYPES[keyA] || DUAL_STAR_ARCHETYPES[keyB];
+    if (dualMatch) {
+      return {
+        combinationId: dualMatch.id,
+        archetype: dualMatch.archetype,
+        ipFamilyId: dualMatch.ipFamily,
+        keywords: dualMatch.keywords,
+        coreAdvantages: dualMatch.coreAdvantages,
+        externalPerception: dualMatch.externalPerception,
+        collisionSummary: dualMatch.collisionSummary
+      };
     }
   }
 
-  // 单星匹配
-  const single = FOURTEEN_STAR_LABELS[star1] || FOURTEEN_STAR_LABELS['紫微'];
+  // 若双星未在预设24组，以第一主星为主
+  const single = FOURTEEN_STAR_LABELS[s1] || FOURTEEN_STAR_LABELS['紫微'];
   return {
     combinationId: undefined,
     archetype: single.singleArchetype,
@@ -212,7 +205,7 @@ function matchStarCombination(star1: string, star2?: string): {
 }
 
 /**
- * 生成命中命盘与迁移盘结果
+ * 完整推演入口函数
  */
 export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV01Result {
   const {
@@ -223,97 +216,87 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
     timezone = 'Asia/Kuala_Lumpur'
   } = input;
 
-  // 1. 解析出生年月日与时辰
+  // 1. 解析阳历日期
   const [yStr, mStr, dStr] = (birthDate || '1995-08-18').split('-');
-  const year = parseInt(yStr, 10) || 1995;
-  const month = parseInt(mStr, 10) || 8;
-  const day = parseInt(dStr, 10) || 18;
-  const hourBranchIdx = getHourBranchIndex(birthTime);
+  const solarYear = parseInt(yStr, 10) || 1995;
+  const solarMonth = parseInt(mStr, 10) || 8;
+  const solarDay = parseInt(dStr, 10) || 18;
 
-  // 2. 计算八字日柱与五行喜用神
-  const dayPillar = calculateDayPillar(year, month, day);
-  const dayStem = dayPillar[0] || '甲';
+  // 2. 调用真实的南派紫微排盘核心
+  const realChart: ZiweiRealChartOutput = calculateRealZiweiChart(
+    solarYear,
+    solarMonth,
+    solarDay,
+    birthTime
+  );
+
+  const { lunar, mutagens } = realChart;
+
+  // 3. 命宫主星解析（含空宫借对宫）
+  const mingStars = realChart.isMingEmpty
+    ? realChart.effectiveMingStars
+    : realChart.mingStars;
+  const mingComb = matchStarCombination(mingStars[0], mingStars[1]);
+  const mingFamilyInfo = IP_FAMILIES[mingComb.ipFamilyId] || IP_FAMILIES.leader_authority;
+
+  // 4. 迁移宫主星解析（对宫为内心世界与外部公众感知）
+  const migrationStars = realChart.isMigrationEmpty
+    ? realChart.effectiveMigrationStars
+    : realChart.migrationStars;
+  const migComb = matchStarCombination(migrationStars[0], migrationStars[1]);
+
+  // 5. 命宫 × 迁移宫专属碰撞总结（大耕老师：忌单宫单星，看命迁一条线）
+  let collisionSummary = mingComb.collisionSummary || '';
+  if (!collisionSummary) {
+    if (realChart.isMingEmpty) {
+      collisionSummary = `命无主星借对宫${migComb.archetype}。你的内核具有极高的弹性与同理心，外在第一眼让人感受到你的${migComb.keywords.slice(0, 3).join('、')}。你不必强行给自己贴上某种僵化的标签，以受众痛点为镜，借势赋能，你就是最优秀的战略连接者。`;
+    } else {
+      collisionSummary = `内在是${mingComb.archetype}，外在更像${migComb.archetype}。你不一定需要一开始就告诉所有人“我是${mingComb.archetype}”，反而可以先透过${migComb.keywords.slice(0, 3).join('、')}建立大众信任。当市场认可你的专业后，你的真实能量会自然被看见。`;
+    }
+  }
+
+  // 6. 生年四化解读（大耕老师体系核心：起于忌，终于禄，禄随忌走）
+  let mutagenInsight = '';
+  const allMutagens = [...mutagens.mingMutagens, ...mutagens.migrationMutagens];
+  if (allMutagens.length > 0) {
+    const parts: string[] = [];
+    allMutagens.forEach((m) => {
+      if (m.includes('化禄')) {
+        parts.push(`【${m}入命迁】：天生自带市场好感与商业变现通畅的顺风运，适合打造高转化商业闭环。`);
+      } else if (m.includes('化权')) {
+        parts.push(`【${m}入命迁】：具有鲜明的话语权与掌控力，适合建立行业标准制定者与严谨交付型顾问IP。`);
+      } else if (m.includes('化科')) {
+        parts.push(`【${m}入命迁】：天生自带名声与曝光光环，非常适合镜头出镜、演讲布道与个人IP破圈。`);
+      } else if (m.includes('化忌')) {
+        parts.push(`【${m}入命迁】：化忌为内心的底层执念与破局动力，你曾经历的痛点卡点，正是你日后最能打动学员的核心故事。`);
+      }
+    });
+    mutagenInsight = parts.join(' ');
+  } else {
+    mutagenInsight = `生年四化照耀三方，你的命迁格局稳健平衡，更适合靠扎实的交付与长期信任稳步积累品牌护城河。`;
+  }
+
+  // 7. 八字喜用神 Booster 计算
+  const dayStem = lunar.dayPillar[0] || '甲';
   const dayElement = STEM_ELEMENTS[dayStem] || 'wood';
+  const lMonth = lunar.lunarMonth;
 
-  // 喜用神算法：根据日主五行与月份节气进行调候/生扶平衡
-  // 春(2,3,4月): 木旺，喜火泄秀或金雕琢；夏(5,6,7月): 火旺，急需水润泽金生水；
-  // 秋(8,9,10月): 金旺，喜水流通或火煅炼；冬(11,12,1月): 水寒，首重火暖局木生火。
+  // 五行喜用神推算
   let usefulElement: ElementKey = 'fire';
-  if ([2, 3, 4].includes(month)) {
+  if ([1, 2, 3].includes(lMonth)) {
     usefulElement = dayElement === 'wood' ? 'fire' : 'water';
-  } else if ([5, 6, 7].includes(month)) {
+  } else if ([4, 5, 6].includes(lMonth)) {
     usefulElement = dayElement === 'fire' ? 'water' : 'metal';
-  } else if ([8, 9, 10].includes(month)) {
+  } else if ([7, 8, 9].includes(lMonth)) {
     usefulElement = dayElement === 'metal' ? 'water' : 'fire';
   } else {
-    // 11, 12, 1月
-    usefulElement = 'fire'; // 调候首选火暖局
+    usefulElement = 'fire'; // 冬季调候喜火暖局
   }
 
-  // 3. 计算紫微排盘中的命宫与迁移宫
-  // 传统法则：寅宫起正月，顺数生月，逆数生时安命宫。
-  // 迁移宫永远与命宫对冲（即相差 6 宫）
-  const mingPalaceBranchIdx = (2 + (month - 1) - hourBranchIdx + 24) % 12;
-  const migrationPalaceBranchIdx = (mingPalaceBranchIdx + 6) % 12;
-
-  // 传统十四主星安星罗盘（根据生日种子与命宫地支确定命宫主星与迁移宫主星）
-  // 建立经典 12 地支对应的稳定星曜分布系（覆盖单星与经典双星）
-  const starPairingsPerBranch: [string[], string[]][] = [
-    // 0: 子 (命宫: 紫微/天府系)
-    [['紫微', '贪狼'], ['天机', '巨门']],
-    // 1: 丑
-    [['太阳', '太阴'], ['天梁']],
-    // 2: 寅
-    [['武曲', '天相'], ['破军']],
-    // 3: 卯
-    [['天同', '天梁'], ['七杀']],
-    // 4: 辰
-    [['廉贞', '天府'], ['贪狼']],
-    // 5: 巳
-    [['天机', '太阴'], ['巨门']],
-    // 6: 午
-    [['紫微', '天府'], ['武曲', '贪狼']],
-    // 7: 未
-    [['太阳', '巨门'], ['天机', '天梁']],
-    // 8: 申
-    [['廉贞', '破军'], ['天相']],
-    // 9: 酉
-    [['天同', '巨门'], ['太阴']],
-    // 10: 戌
-    [['武曲', '七杀'], ['天府']],
-    // 11: 亥
-    [['天机'], ['太阴']]
-  ];
-
-  // 结合出生日进一步微调匹配，确保每个人都有高度个性化的精准命盘
-  const branchConfig = starPairingsPerBranch[(mingPalaceBranchIdx + (day % 3)) % 12];
-  const mingStars = branchConfig[0];
-  const migrationStars = branchConfig[1];
-
-  // 4. 解析命宫原型
-  const mingStar1 = mingStars[0];
-  const mingStar2 = mingStars.length > 1 ? mingStars[1] : undefined;
-  const mingCombination = matchStarCombination(mingStar1, mingStar2);
-
-  // 5. 解析迁移宫原型
-  const migStar1 = migrationStars[0];
-  const migStar2 = migrationStars.length > 1 ? migrationStars[1] : undefined;
-  const migCombination = matchStarCombination(migStar1, migStar2);
-
-  // 6. 生成核心家族与撞色文案
-  const mingFamilyInfo = IP_FAMILIES[mingCombination.ipFamilyId] || IP_FAMILIES.leader_authority;
-
-  // 7. 生成「命宫 × 迁移宫」一句话总结 (Section 10, 11, 35)
-  // 碰撞规则：如果双星库已有定制 collisionSummary，优先使用；
-  // 否则根据 命宫原型 × 迁移宫外显 动态生成深刻文案
-  let collisionSummary = mingCombination.collisionSummary || '';
-  if (!collisionSummary) {
-    collisionSummary = `内在是${mingCombination.archetype}，外在更像${migCombination.archetype}。你不一定需要一开始就告诉所有人“我是${mingCombination.archetype}”，反而可以先透过${migCombination.keywords.slice(0, 3).join('、')}建立大众信任。当市场认可你的专业后，你的真实能量会自然被看见。`;
-  }
-
-  // 8. 八字喜用神 Booster 解析
   const boosterSummary = getElementBoosterSummary(usefulElement);
   const elementDetails = ELEMENT_BOOSTERS[usefulElement];
+
+  const lunarDateStr = `农历 ${lunar.yearPillar}年 ${lunar.isLeap ? '闰' : ''}${lunar.lunarMonth}月${lunar.lunarDay}日 ${lunar.hourBranchName}时`;
 
   return {
     user: {
@@ -321,32 +304,51 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
       gender,
       birth_date: birthDate,
       birth_time: birthTime,
-      timezone
+      timezone,
+      lunar_date_str: lunarDateStr
     },
     ziwei: {
       ming_palace: {
         stars: mingStars,
-        combination_id: mingCombination.combinationId,
-        archetype: mingCombination.archetype,
+        is_empty: realChart.isMingEmpty,
+        borrowed_from_migration: realChart.isMingEmpty,
+        palace_branch: realChart.mingPalaceBranchName,
+        palace_stem: realChart.mingPalaceStemName,
+        palace_pillar: realChart.mingPalacePillar,
+        bureau_name: realChart.bureauName,
+        combination_id: mingComb.combinationId,
+        archetype: mingComb.archetype,
         ip_family: mingFamilyInfo.name,
-        ip_family_id: mingCombination.ipFamilyId,
-        keywords: mingCombination.keywords,
-        core_advantages: mingCombination.coreAdvantages,
+        ip_family_id: mingComb.ipFamilyId,
+        keywords: mingComb.keywords,
+        core_advantages: mingComb.coreAdvantages,
+        mutagens: mutagens.mingMutagens,
         explanation: '命宫决定你的 IP 内核。它代表你最自然、最稳定，也最容易长期发挥的核心优势。'
       },
       migration_palace: {
         stars: migrationStars,
-        combination_id: migCombination.combinationId,
-        archetype: migCombination.archetype,
-        keywords: migCombination.keywords,
-        external_perception: migCombination.externalPerception,
+        is_empty: realChart.isMigrationEmpty,
+        palace_branch: EARTHLY_BRANCHES[(realChart.mingPalaceBranchIndex + 6) % 12],
+        combination_id: migComb.combinationId,
+        archetype: migComb.archetype,
+        keywords: migComb.keywords,
+        external_perception: migComb.externalPerception,
+        mutagens: mutagens.migrationMutagens,
         explanation: '迁移宫决定你的 IP 外显。你自己认为的自己，和市场看到的你，不一定完全一样。'
       },
+      shen_palace: {
+        name: realChart.shenPalaceName,
+        meaning: realChart.shenPalaceMeaning
+      },
       collision_summary: collisionSummary,
-      core_one_liner: mingFamilyInfo.oneLiner
+      core_one_liner: mingFamilyInfo.oneLiner,
+      mutagen_insight: mutagenInsight
     },
     bazi: {
-      day_pillar: dayPillar,
+      day_pillar: lunar.dayPillar,
+      year_pillar: lunar.yearPillar,
+      month_pillar: lunar.monthPillar,
+      hour_pillar: lunar.hourPillar,
       useful_element: usefulElement,
       useful_element_name: boosterSummary.elementName,
       ip_booster: {
