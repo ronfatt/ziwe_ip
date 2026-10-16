@@ -72,7 +72,7 @@ interface AssessmentStore extends AssessmentState {
   quickAnalyzeFromBirth: (birthDate: string, displayName?: string, birthTime?: string, gender?: any) => void;
 }
 
-const STORAGE_KEY = 'ziwei_ip_dna_state_v1';
+const STORAGE_KEY = 'ziwei_ip_dna_state_v2';
 
 const getInitialState = (): AssessmentState => {
   if (typeof window !== 'undefined') {

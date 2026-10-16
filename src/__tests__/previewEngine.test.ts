@@ -121,4 +121,29 @@ describe('紫微 IP DNA 战略系统｜引流测试版 Preview V0.1 Engine Tests
     expect(resA.ziwei.migration_palace.archetype).toBe(resB.ziwei.migration_palace.archetype);
     expect(resA.bazi.useful_element).toBe(resB.bazi.useful_element);
   });
+
+  it('prints diagnostic chart details for verification', () => {
+    const testCases = [
+      { date: '1995-08-18', time: '12:00' },
+      { date: '1988-10-10', time: '08:30' },
+      { date: '1979-12-03', time: '12:00' },
+      { date: '1990-05-15', time: '14:00' }
+    ];
+
+    testCases.forEach(tc => {
+      const res = calculateZiweiIpDnaPreview({
+        birthDate: tc.date,
+        birthTime: tc.time
+      });
+      console.log(`\n=== CASE ${tc.date} ${tc.time} ===`);
+      console.log('Lunar:', res.user.lunar_date_str);
+      console.log('Ming Branch:', res.ziwei.ming_palace.palace_branch);
+      console.log('Ming Pillar & Bureau:', res.ziwei.ming_palace.palace_pillar, res.ziwei.ming_palace.bureau_name);
+      console.log('Ming Stars:', res.ziwei.ming_palace.stars.join(', '));
+      console.log('Migration Stars:', res.ziwei.migration_palace.stars.join(', '));
+      console.log('Is Empty Borrowed:', res.ziwei.ming_palace.borrowed_from_migration);
+      console.log('Archetype:', res.ziwei.ming_palace.archetype);
+    });
+  });
 });
+

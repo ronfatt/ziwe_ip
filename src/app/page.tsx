@@ -35,6 +35,22 @@ export default function HomePage() {
   const [birthTime, setBirthTime] = useState('12:00');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 12 时辰快捷定义表
+  const SHICHEN_LIST = [
+    { label: '子时', time: '00:00', desc: '23:00-01:00' },
+    { label: '丑时', time: '02:00', desc: '01:00-03:00' },
+    { label: '寅时', time: '04:00', desc: '03:00-05:00' },
+    { label: '卯时', time: '06:00', desc: '05:00-07:00' },
+    { label: '辰时', time: '08:00', desc: '07:00-09:00' },
+    { label: '巳时', time: '10:00', desc: '09:00-11:00' },
+    { label: '午时', time: '12:00', desc: '11:00-13:00' },
+    { label: '未时', time: '14:00', desc: '13:00-15:00' },
+    { label: '申时', time: '16:00', desc: '15:00-17:00' },
+    { label: '酉时', time: '18:00', desc: '17:00-19:00' },
+    { label: '戌时', time: '20:00', desc: '19:00-21:00' },
+    { label: '亥时', time: '22:00', desc: '21:00-23:00' },
+  ];
+
   const handleStartAnalysis = (e: React.FormEvent) => {
     e.preventDefault();
     if (!birthDate) {
@@ -48,14 +64,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] max-w-lg md:max-w-xl mx-auto px-4 py-4 md:py-6 space-y-4">
-      {/* 1. HERO BANNER: 找出你的紫微 IP DNA */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/70 p-5 border border-blue-100/70 shadow-xs">
-        {/* Official Brand Logo Emblem with Orbit & Light Effects */}
-        <div className="absolute -top-1 -right-2 w-32 h-32 pointer-events-none">
+      {/* 1. HERO BANNER: 100% 呼应讲座大屏 PPT 主视觉 */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#18111A] via-[#10121B] to-[#0A0C14] p-6 border border-amber-500/30 shadow-2xl shadow-rose-950/20">
+        {/* Background Cosmic Energy Glow (Glowing Red Solar Orb from PPT) */}
+        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-gradient-to-br from-rose-600/35 via-amber-600/20 to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-36 h-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+
+        {/* Right floating official logo emblem with golden rim */}
+        <div className="absolute top-4 right-4 w-20 h-20 pointer-events-none opacity-90">
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Glowing ambient ring */}
-            <div className="absolute w-24 h-24 rounded-full bg-blue-500/20 blur-md animate-pulse" />
-            <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/25 border border-blue-400/30 bg-slate-950">
+            <div className="absolute w-20 h-20 rounded-full bg-rose-500/20 blur-md animate-pulse" />
+            <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-xl shadow-rose-950/60 border border-amber-400/40 bg-slate-950">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo.png"
@@ -63,92 +82,106 @@ export default function HomePage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Ambient stars */}
-            <span className="absolute top-1 left-2 text-blue-500 text-xs font-bold">✦</span>
-            <span className="absolute bottom-2 right-1 text-indigo-400 text-xs font-bold">★</span>
+            <span className="absolute -top-1 left-0 text-amber-300 text-xs font-bold animate-ping">✦</span>
           </div>
         </div>
 
-        <div className="relative z-10 max-w-[70%] space-y-2">
-          {/* Section 41: Visual Language Pill */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100/70 border border-blue-200/80 text-[10px] font-black text-[#2563EB] tracking-wider uppercase">
-            <span>ZIWEI</span>
-            <span>·</span>
-            <span>IP</span>
-            <span>·</span>
-            <span>DNA</span>
-            <span className="text-[9px] font-normal text-blue-500">Preview V0.1</span>
+        <div className="relative z-10 space-y-2.5 max-w-[82%]">
+          {/* Keynote Tag: PERSONAL BRAND STRATEGY × DESTINY DNA */}
+          <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-black text-rose-400 tracking-widest uppercase">
+            <span>PERSONAL BRAND STRATEGY</span>
+            <span className="text-amber-400">×</span>
+            <span>DESTINY DNA</span>
           </div>
 
-          {/* Section 4: Main Headline */}
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-            找出你的紫微 IP DNA
-          </h1>
+          {/* Keynote Title: 紫微 IP DNA */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-serif font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#FFF4D2] via-[#F6D268] to-[#D5A021]">
+              紫微 IP DNA
+            </h1>
+            {/* Golden divider line */}
+            <div className="h-0.5 w-16 bg-gradient-to-r from-amber-400 via-rose-500 to-transparent mt-1.5" />
+          </div>
 
-          {/* Section 4: Subtitle */}
-          <p className="text-xs text-slate-600 leading-relaxed font-normal">
-            你的个人品牌，不一定要从模仿别人开始。从你的命宫、迁移宫与八字能量，看见你天生更容易被市场记住的方式。
+          {/* Keynote Subtitle: 从命盘找到你最有影响力的个人品牌 */}
+          <h2 className="text-sm sm:text-base font-bold text-[#F3E5C8] tracking-tight leading-snug">
+            从命盘找到你最有影响力的个人品牌
+          </h2>
+
+          {/* Keynote Quote: 不是教你成为别人，而是找出你最值得被看见的那一面 */}
+          <p className="text-xs text-slate-300 font-normal leading-relaxed pt-1 border-t border-white/10">
+            不是教你成为别人，<br />
+            而是找出你最值得被看见的那一面。
           </p>
 
-          <div className="pt-1 flex items-center gap-2 text-[11px] text-slate-500">
-            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-              <Zap className="w-3.5 h-3.5 fill-emerald-500 text-emerald-500" />
-              2–3 分钟快速测出
+          <div className="pt-2 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="text-amber-300 font-bold flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3 text-amber-300" />
+              找到你的光，放大你的价值
             </span>
-            <span className="text-slate-300">|</span>
-            <span>东方命理 × 品牌战略</span>
+            <span className="text-slate-400 text-[10px]">
+              易玺老师 ｜ 企业风水战略顾问
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 2. CORE ACTION CARD: 用户输入资料 (Section 5) */}
-      <div className="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div className="flex items-center gap-1.5">
-            <Compass className="w-4 h-4 text-[#2563EB]" />
-            <h2 className="text-sm font-bold text-slate-900">
-              输入出生资料进行排盘
+      {/* 2. CORE ACTION CARD: 输入出生资料进行排盘 */}
+      <div className="rounded-2xl card-obsidian p-5 space-y-4">
+        <div className="flex items-center justify-between pb-2.5 border-b border-amber-500/20">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+              <Compass className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-sm font-bold text-white tracking-wide">
+              输入出生资料 · 现场极速推演
             </h2>
           </div>
-          <span className="text-[11px] font-medium text-slate-400">
-            默认时区 GMT+8
+          <span className="text-[10px] font-semibold text-amber-400/80 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-full">
+            现场试听课专用
           </span>
         </div>
 
-        <form onSubmit={handleStartAnalysis} className="space-y-3.5">
+        <form onSubmit={handleStartAnalysis} className="space-y-4">
           {/* 姓名与性别 */}
           <div className="grid grid-cols-5 gap-2.5">
             <div className="col-span-3 space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-xs font-semibold text-slate-300">
                 姓名 / 英文名
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="如：Calven / 奕凡"
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-xs sm:text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 focus:outline-none transition"
-                />
-              </div>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="如：Calven / 奕凡"
+                className="w-full rounded-xl bg-[#0F111D] border border-slate-700/80 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition"
+              />
             </div>
 
             <div className="col-span-2 space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">
+              <label className="block text-xs font-semibold text-slate-300">
                 性别
               </label>
-              <div className="flex bg-slate-100 border border-slate-200 rounded-xl p-1 h-[42px] items-center">
+              <div className="flex bg-[#0F111D] border border-slate-700/80 rounded-xl p-1 h-[42px] items-center">
                 <button
                   type="button"
                   onClick={() => setGender('male')}
-                  className={`flex-1 h-full rounded-lg text-xs font-bold transition flex items-center justify-center ${gender === 'male' ? 'bg-[#2563EB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+                  className={`flex-1 h-full rounded-lg text-xs font-bold transition flex items-center justify-center ${
+                    gender === 'male'
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
                 >
                   男
                 </button>
                 <button
                   type="button"
                   onClick={() => setGender('female')}
-                  className={`flex-1 h-full rounded-lg text-xs font-bold transition flex items-center justify-center ${gender === 'female' ? 'bg-[#2563EB] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+                  className={`flex-1 h-full rounded-lg text-xs font-bold transition flex items-center justify-center ${
+                    gender === 'female'
+                      ? 'bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-md font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
                 >
                   女
                 </button>
@@ -159,146 +192,169 @@ export default function HomePage() {
           {/* 出生日期 */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-700">
-                出生日期（阳历 / 公历）<span className="text-rose-500 ml-0.5">*</span>
+              <label className="block text-xs font-semibold text-slate-300">
+                出生日期（阳历 / 公历）<span className="text-rose-400 ml-0.5">*</span>
               </label>
-              <span className="text-[10px] text-slate-400">系统自动换算农历与干支</span>
+              <span className="text-[10px] text-amber-400/80">系统自动排布农历与天干地支</span>
             </div>
-            <div className="relative">
-              <input
-                type="date"
-                required
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 focus:outline-none transition"
-              />
-            </div>
+            <input
+              type="date"
+              required
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className="w-full rounded-xl bg-[#0F111D] border border-slate-700/80 px-3.5 py-2.5 text-sm font-medium text-white focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition [color-scheme:dark]"
+            />
           </div>
 
-          {/* 出生时间 */}
-          <div className="space-y-1">
+          {/* 出生时辰（快捷选择 + 精确时间） */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-700">
-                出生时间
+              <label className="block text-xs font-semibold text-slate-300">
+                出生时辰 / 时间
               </label>
-              <span className="text-[10px] text-slate-400">若不确定可保留默认午时 (12:00)</span>
+              <span className="text-[10px] text-slate-400">可一键点选时辰，或保留默认午时</span>
             </div>
-            <div className="relative">
+
+            {/* 12时辰一键胶囊选择栏 */}
+            <div className="grid grid-cols-6 sm:grid-cols-6 gap-1">
+              {SHICHEN_LIST.map((sc) => {
+                const isSelected = birthTime.startsWith(sc.time.slice(0, 2));
+                return (
+                  <button
+                    key={sc.label}
+                    type="button"
+                    onClick={() => setBirthTime(sc.time)}
+                    className={`py-1.5 px-1 rounded-lg text-[11px] font-bold transition border text-center ${
+                      isSelected
+                        ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-sm'
+                        : 'bg-[#0E1019] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                  >
+                    <div>{sc.label}</div>
+                    <div className="text-[9px] opacity-70 scale-90">{sc.desc.split('-')[0]}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 精确时间微调 */}
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[11px] text-slate-400 shrink-0">精确钟表时间：</span>
               <input
                 type="time"
                 value={birthTime}
                 onChange={(e) => setBirthTime(e.target.value)}
-                className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 focus:outline-none transition"
+                className="rounded-xl bg-[#0F111D] border border-slate-700/80 px-3 py-1.5 text-xs font-medium text-white focus:border-amber-400 focus:outline-none [color-scheme:dark]"
               />
             </div>
           </div>
 
-          {/* Primary CTA Button: 开始测试我的 IP DNA (Section 4) */}
+          {/* Primary CTA Button: 讲座同款太阳流光金焰按钮 */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full mt-2 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-blue-500/25 transition flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full mt-2 py-3.5 rounded-xl btn-solar-gold font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-rose-950/50"
           >
-            <Sparkles className="w-4 h-4 fill-white" />
-            <span>{isSubmitting ? '系统正在精准排盘...' : '开始测试我的 IP DNA →'}</span>
+            <Sparkles className="w-4 h-4 fill-amber-200 text-amber-200" />
+            <span>{isSubmitting ? '正在结合命盘推演 IP DNA...' : '开始测试我的 IP DNA →'}</span>
           </button>
         </form>
 
-        {/* Local Security & Sandbox Notice */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-          <span className="flex items-center gap-1 text-emerald-600 font-medium">
+        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+          <span className="flex items-center gap-1 text-emerald-400 font-medium">
             <ShieldCheck className="w-3.5 h-3.5" />
-            权威排盘算法 · 严格保护隐私
+            大耕老师正统命理算法 · 隐私保护
           </span>
-          <span className="text-slate-400">无需注册 即开即测</span>
+          <span className="text-amber-400/80 font-mono">2–3 分钟测出</span>
         </div>
       </div>
 
       {/* 3. 核心测算公式说明 (Section 1 & 11) */}
-      <div className="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3">
+      <div className="rounded-2xl card-obsidian p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-[#2563EB]" />
-            Preview 版为你揭示三大核心能量
+          <span className="text-xs font-bold text-white flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-amber-400" />
+            Preview 核心推演公式
           </span>
-          <span className="text-[10px] font-bold text-[#2563EB] bg-blue-50 px-2 py-0.5 rounded-md">
-            核心公式
+          <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-md">
+            三大能量支柱
           </span>
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-center">
           {/* 1. 命宫主星 */}
-          <div className="p-2.5 rounded-xl bg-blue-50/60 border border-blue-100 flex flex-col justify-between">
+          <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-amber-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-blue-600 block">命宫主星</span>
-              <span className="text-xs font-black text-slate-800 block">我是谁</span>
+              <span className="text-[10px] font-bold text-amber-400 block">命宫主星</span>
+              <span className="text-xs font-black text-white block">我是谁</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1 leading-tight">
-              核心特质与优势原型
+            <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+              核心优势与内在原型
             </p>
           </div>
 
           {/* 2. 迁移宫主星 */}
-          <div className="p-2.5 rounded-xl bg-indigo-50/60 border border-indigo-100 flex flex-col justify-between">
+          <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-rose-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-indigo-600 block">迁移宫主星</span>
-              <span className="text-xs font-black text-slate-800 block">别人怎么看我</span>
+              <span className="text-[10px] font-bold text-rose-400 block">迁移宫主星</span>
+              <span className="text-xs font-black text-white block">别人怎么看我</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1 leading-tight">
-              公众感知与外显形象
+            <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+              公众感知与外显人设
             </p>
           </div>
 
           {/* 3. 八字喜用神 */}
-          <div className="p-2.5 rounded-xl bg-amber-50/60 border border-amber-100 flex flex-col justify-between">
+          <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-amber-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-amber-600 block">八字喜用神</span>
-              <span className="text-xs font-black text-slate-800 block">能量放大</span>
+              <span className="text-[10px] font-bold text-amber-300 block">八字喜用神</span>
+              <span className="text-xs font-black text-white block">能量放大</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1 leading-tight">
-              品牌表达与五行加速器
+            <p className="text-[10px] text-slate-400 mt-1 leading-tight">
+              品牌穿搭与视觉赋能
             </p>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 text-[11px] text-slate-600 leading-relaxed">
-          <span className="font-bold text-slate-800">💡 为什么是命宫 × 迁移宫？</span>
-          你自己认为的自己，和市场看到的你，不一定完全一样。真正的个人影响力，是<strong>「核心的你」</strong>与<strong>「市场看到的你」</strong>碰撞出的化学反应。
+        <div className="p-2.5 rounded-xl bg-[#0C0E17] border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
+          <span className="font-bold text-amber-300">💡 为什么是命宫 × 迁移宫？</span>
+          你自己认为的自己，和市场看到的你，不一定完全一样。真正的个人品牌爆发力，是<strong>「核心的你」</strong>与<strong>「市场看到的你」</strong>碰撞出的化学反应。
         </div>
       </div>
 
-      {/* 4. 六大家族一览标签 */}
-      <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5">
+      {/* 4. 六大核心 IP 家族快速认知 */}
+      <div className="p-4 rounded-2xl card-obsidian space-y-2.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-slate-800">你属于六大核心 IP 家族的哪一类？</span>
-          <span className="text-[10px] text-slate-400">14主星融合归纳</span>
+          <span className="font-bold text-white">六大核心 IP 家族原型</span>
+          <span className="text-[10px] text-amber-400">14 主星定位系统</span>
         </div>
         <div className="grid grid-cols-3 gap-1.5 text-[11px]">
-          <div className="px-2 py-1.5 rounded-lg bg-amber-50 text-amber-800 font-semibold border border-amber-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-amber-500/10 text-amber-200 font-bold border border-amber-400/30 text-center">
             👑 领袖权威型
           </div>
-          <div className="px-2 py-1.5 rounded-lg bg-blue-50 text-blue-800 font-semibold border border-blue-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-blue-500/10 text-blue-200 font-bold border border-blue-400/30 text-center">
             🧠 智慧策略型
           </div>
-          <div className="px-2 py-1.5 rounded-lg bg-purple-50 text-purple-800 font-semibold border border-purple-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-purple-500/10 text-purple-200 font-bold border border-purple-400/30 text-center">
             📢 表达传播型
           </div>
-          <div className="px-2 py-1.5 rounded-lg bg-rose-50 text-rose-800 font-semibold border border-rose-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-rose-500/10 text-rose-200 font-bold border border-rose-400/30 text-center">
             🔥 开创破局型
           </div>
-          <div className="px-2 py-1.5 rounded-lg bg-teal-50 text-teal-800 font-semibold border border-teal-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-emerald-500/10 text-emerald-200 font-bold border border-emerald-400/30 text-center">
             🤝 信任导师型
           </div>
-          <div className="px-2 py-1.5 rounded-lg bg-orange-50 text-orange-800 font-semibold border border-orange-200/60 text-center">
+          <div className="px-2 py-2 rounded-lg bg-orange-500/10 text-orange-200 font-bold border border-orange-400/30 text-center">
             🎯 实战结果型
           </div>
         </div>
       </div>
 
-      {/* 5. 底部免责与版权 */}
-      <div className="text-center text-[10px] text-slate-400 py-1">
-        紫微 IP DNA 战略系统 · Preview Test Version V0.1 · 试听课现场测试版
+      {/* 5. 底部版权 */}
+      <div className="text-center text-[10px] text-slate-500 py-1">
+        紫微 IP DNA 战略系统 · Preview V0.1 · 易玺老师试听课专研
       </div>
     </div>
   );
 }
+
