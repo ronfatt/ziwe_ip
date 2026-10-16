@@ -440,11 +440,12 @@ export default function ReportSummaryPage() {
               <span className="text-[10px] text-slate-400">五行喜用神 IP Booster</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#0D0F1B] border border-slate-800 text-slate-200">
-            <span>四柱：</span>
-            <span className="text-slate-400">{bazi.year_pillar}年</span>
-            <span className="text-amber-300 font-black">{bazi.day_pillar}日</span>
-            <span className="text-slate-400">{bazi.hour_pillar}时</span>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-[#0D0F1B] border border-amber-500/25 text-slate-200">
+            <span className="text-amber-400/90 font-sans font-semibold">四柱八字：</span>
+            <span className="text-slate-300">{bazi.year_pillar}年</span>
+            <span className="text-slate-300">{bazi.month_pillar}月</span>
+            <span className="text-amber-300 font-black px-1 rounded bg-amber-500/10 border border-amber-400/30">{bazi.day_pillar}日</span>
+            <span className="text-slate-300">{bazi.hour_pillar}时</span>
           </div>
         </div>
 
@@ -622,12 +623,14 @@ export default function ReportSummaryPage() {
                 <span>{ziwei.collision_summary.split('。')[0]}。</span>
               </div>
 
-              {/* 五行放大器 */}
-              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800 font-mono">
-                <span>日柱：{bazi.day_pillar}</span>
-                <span className="font-bold text-gold-gradient">
-                  喜用神：{bazi.useful_element_name}（{bazi.ip_booster.boost}）
-                </span>
+              {/* 五行放大器与四柱 */}
+              <div className="flex flex-col gap-1 text-[10px] text-slate-400 pt-1.5 border-t border-slate-800 font-mono">
+                <div className="flex items-center justify-between">
+                  <span>四柱：{bazi.year_pillar} {bazi.month_pillar} {bazi.day_pillar} {bazi.hour_pillar}</span>
+                  <span className="font-bold text-gold-gradient">
+                    喜用：{bazi.useful_element_name}（{bazi.ip_booster.boost}）
+                  </span>
+                </div>
               </div>
 
               {/* QR Code Demo Placeholder */}

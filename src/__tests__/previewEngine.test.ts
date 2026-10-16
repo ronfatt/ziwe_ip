@@ -122,28 +122,31 @@ describe('紫微 IP DNA 战略系统｜引流测试版 Preview V0.1 Engine Tests
     expect(resA.bazi.useful_element).toBe(resB.bazi.useful_element);
   });
 
-  it('prints diagnostic chart details for verification', () => {
-    const testCases = [
-      { date: '1995-08-18', time: '12:00' },
-      { date: '1988-10-10', time: '08:30' },
-      { date: '1979-12-03', time: '12:00' },
-      { date: '1990-05-15', time: '14:00' }
-    ];
-
-    testCases.forEach(tc => {
-      const res = calculateZiweiIpDnaPreview({
-        birthDate: tc.date,
-        birthTime: tc.time
-      });
-      console.log(`\n=== CASE ${tc.date} ${tc.time} ===`);
-      console.log('Lunar:', res.user.lunar_date_str);
-      console.log('Ming Branch:', res.ziwei.ming_palace.palace_branch);
-      console.log('Ming Pillar & Bureau:', res.ziwei.ming_palace.palace_pillar, res.ziwei.ming_palace.bureau_name);
-      console.log('Ming Stars:', res.ziwei.ming_palace.stars.join(', '));
-      console.log('Migration Stars:', res.ziwei.migration_palace.stars.join(', '));
-      console.log('Is Empty Borrowed:', res.ziwei.ming_palace.borrowed_from_migration);
-      console.log('Archetype:', res.ziwei.ming_palace.archetype);
-    });
+  it('checks 1976 癸酉日 test chart and verifies all 4 pillars', () => {
+    // Search dates in 1976 that yield 癸酉日
+    for (let m = 1; m <= 12; m++) {
+      for (let d = 1; d <= 31; d++) {
+        try {
+          const dateStr = `1976-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const res = calculateZiweiIpDnaPreview({
+            birthDate: dateStr,
+            birthTime: '10:00' // 巳时
+          });
+          if (res.bazi.day_pillar === '癸酉') {
+            console.log('\n=== USER CHART FOUND ===');
+            console.log('Date:', dateStr, '巳时 (10:00)');
+            console.log('Four Pillars:', `${res.bazi.year_pillar}年 ${res.bazi.month_pillar}月 ${res.bazi.day_pillar}日 ${res.bazi.hour_pillar}时`);
+            console.log('Lunar:', res.user.lunar_date_str);
+            console.log('Ming Branch:', res.ziwei.ming_palace.palace_branch);
+            console.log('Ming Pillar & Bureau:', res.ziwei.ming_palace.palace_pillar, res.ziwei.ming_palace.bureau_name);
+            console.log('Ming Stars:', res.ziwei.ming_palace.stars);
+            console.log('Migration Stars:', res.ziwei.migration_palace.stars);
+            console.log('Archetype:', res.ziwei.ming_palace.archetype);
+          }
+        } catch (e) {}
+      }
+    }
   });
 });
+
 
