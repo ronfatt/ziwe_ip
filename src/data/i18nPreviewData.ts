@@ -64,6 +64,7 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
   contentTendency: string;
   oneLiner: string;
   coreDriver: string;
+  avatarUrl?: string;
 }> = {
   leader_authority: {
     name: 'Leader & Authority',
@@ -72,7 +73,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Executive Authority, Founder IP, Strategic Advisory, Leadership IP, Corporate Governance IP.',
     contentTendency: 'Strategic Frameworks, Decision-Making Case Studies, Trend Forecasts, Executive Perspectives.',
     oneLiner: 'You are naturally wired to lead the way, not to spend your life following others.',
-    coreDriver: 'Vision · Direction · Resource Integration · Authority · Decisive Power'
+    coreDriver: 'Vision · Direction · Resource Integration · Authority · Decisive Power',
+    avatarUrl: '/avatars/leader_authority.png'
   },
   strategy_intelligence: {
     name: 'Strategy & Intelligence',
@@ -81,7 +83,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Subject Matter Expert IP, Strategic Advisor, Knowledge IP, Master Thinker, Behind-the-Scenes Counsel.',
     contentTendency: 'Proprietary Methodologies, Deconstructions, Masterclasses, High-Leverage Strategic Insights.',
     oneLiner: 'Your true leverage comes from seeing three steps ahead of the crowd.',
-    coreDriver: 'Deep Thinking · Insight · Structured Analysis · High-Leverage Wisdom'
+    coreDriver: 'Deep Thinking · Insight · Structured Analysis · High-Leverage Wisdom',
+    avatarUrl: '/avatars/strategy_intelligence.png'
   },
   communication_influence: {
     name: 'Voice & Influence',
@@ -90,7 +93,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Media IP, Anchor / Keynote Speaker IP, Opinion Leader, Lifestyle IP, High-Conversion Social Brand.',
     contentTendency: 'Provocative Perspectives, Relatable Stories, In-Depth Interviews, High-Engagement Media.',
     oneLiner: 'Your superpower is not just what you know, but making people love listening to you.',
-    coreDriver: 'Vocal Impact · Storytelling · Audience Magnetism · Cultural Resonance'
+    coreDriver: 'Vocal Impact · Storytelling · Audience Magnetism · Cultural Resonance',
+    avatarUrl: '/avatars/communication_influence.png'
   },
   disruption_pioneer: {
     name: 'Pioneer & Disruptor',
@@ -99,7 +103,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Entrepreneurial Trailblazer, Industry Challenger, Bold Opinion IP, Turnaround Consultant.',
     contentTendency: 'Challenging Legacy Mindsets, Exposing Systemic Flaws, Radical Transformations, Contrarian Theses.',
     oneLiner: 'Your true worth shines when everyone else hesitates, and you dare to take the first leap.',
-    coreDriver: 'Audacity · Radical Innovation · Unconventional Angles · Relentless Momentum'
+    coreDriver: 'Audacity · Radical Innovation · Unconventional Angles · Relentless Momentum',
+    avatarUrl: '/avatars/disruption_pioneer.png'
   },
   trust_mentor: {
     name: 'Trust & Mentor',
@@ -108,7 +113,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Master Mentor IP, Holistic Educator, Transformational Coach, Trusted Family / Brand Advisory.',
     contentTendency: 'Transformational Pedagogy, Life Mastery Reflections, Student Growth Stories, Long-Horizon Principles.',
     oneLiner: 'Your deepest commercial gravity comes from people willing to trust you for life.',
-    coreDriver: 'Deep Trust · Lifelong Companionship · Generational Wisdom · Grounded Integrity'
+    coreDriver: 'Deep Trust · Lifelong Companionship · Generational Wisdom · Grounded Integrity',
+    avatarUrl: '/avatars/trust_mentor.png'
   },
   execution_results: {
     name: 'Execution & Results',
@@ -117,7 +123,8 @@ export const IP_FAMILIES_EN: Record<IPFamilyId, {
     ipAdvantage: 'Best suited to build: Implementation Expert, High-ROI Operator, Battle-Tested Builder, Performance Advisor.',
     contentTendency: 'Real Case Studies, Hard Data, Transparent Before/After Metrics, Actionable Blueprints.',
     oneLiner: 'Rather than speaking eloquently, you let undeniable results earn market reverence.',
-    coreDriver: 'Decisive Action · Flawless Delivery · Quantifiable Impact · Real World Execution'
+    coreDriver: 'Decisive Action · Flawless Delivery · Quantifiable Impact · Real World Execution',
+    avatarUrl: '/avatars/execution_results.png'
   }
 };
 

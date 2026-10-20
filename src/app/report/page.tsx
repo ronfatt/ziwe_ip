@@ -178,16 +178,19 @@ export default function ReportSummaryPage() {
         {/* Ambient Cosmic Glow */}
         <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-rose-600/30 blur-3xl pointer-events-none" />
 
-        {/* Official Brand Logo Emblem Artwork */}
+        {/* 3D Cute Chibi IP Archetype Character Artwork */}
         <div className="absolute -top-1 -right-2 w-28 h-28 pointer-events-none">
           <div className="relative w-full h-full flex items-center justify-center">
-            <div className="absolute w-20 h-20 rounded-full bg-rose-500/20 blur-lg" />
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-xl shadow-rose-950/60 border border-amber-400/40 bg-slate-950">
+            <div className="absolute w-22 h-22 rounded-full bg-amber-500/20 blur-xl animate-pulse" />
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-2xl shadow-rose-950/70 border-2 border-amber-400/50 bg-[#0E101B]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo.png"
-                alt="ZIWEI IP DNA Logo"
-                className="w-full h-full object-cover"
+                src={familyInfo.avatarUrl || `/avatars/${ziwei.ming_palace.ip_family_id}.png`}
+                alt={familyInfo.name}
+                className="w-full h-full object-cover scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/logo.png';
+                }}
               />
             </div>
             <span className="absolute top-1 left-2 text-amber-300 text-xs font-bold animate-ping">✦</span>
@@ -307,8 +310,16 @@ export default function ReportSummaryPage() {
             )}
           </div>
 
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-rose-600 text-slate-950 font-black flex items-center justify-center shadow-md shadow-rose-950/40 shrink-0">
-            <FamilyIcon className="w-5 h-5 text-slate-950" />
+          <div className="w-12 h-12 rounded-xl overflow-hidden border border-amber-400/50 shadow-md shadow-rose-950/40 shrink-0 bg-[#0E101B]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={familyInfo.avatarUrl || `/avatars/${ziwei.ming_palace.ip_family_id}.png`}
+              alt={familyInfo.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/logo.png';
+              }}
+            />
           </div>
         </div>
 
@@ -653,13 +664,16 @@ export default function ReportSummaryPage() {
                 </span>
               </div>
 
-              {/* Central Official Logo Graphic */}
-              <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden shadow-lg shadow-rose-950/60 border border-amber-400/50 bg-slate-950">
+              {/* Central Official Cute Chibi Character Artwork */}
+              <div className="w-24 h-24 mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-rose-950/70 border-2 border-amber-400/60 bg-[#0E101B]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/logo.png"
-                  alt="ZIWEI IP DNA Logo"
-                  className="w-full h-full object-cover"
+                  src={familyInfo.avatarUrl || `/avatars/${ziwei.ming_palace.ip_family_id}.png`}
+                  alt={familyInfo.name}
+                  className="w-full h-full object-cover scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/logo.png';
+                  }}
                 />
               </div>
 

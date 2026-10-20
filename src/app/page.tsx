@@ -23,6 +23,8 @@ import {
   Radio
 } from 'lucide-react';
 import { Gender } from '@/types';
+import { IP_FAMILIES } from '@/data/previewV01Data';
+import { IP_FAMILIES_EN } from '@/data/i18nPreviewData';
 
 export default function HomePage() {
   const router = useRouter();
@@ -369,25 +371,33 @@ export default function HomePage() {
             {isEn ? '14 Stars Positioning System' : '14 主星定位系统'}
           </span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
-          <div className="px-2 py-2 rounded-lg bg-amber-500/10 text-amber-200 font-bold border border-amber-400/30 text-center">
-            👑 {isEn ? 'Leader & Authority' : '领袖权威型'}
-          </div>
-          <div className="px-2 py-2 rounded-lg bg-blue-500/10 text-blue-200 font-bold border border-blue-400/30 text-center">
-            🧠 {isEn ? 'Strategy & Intelligence' : '智慧策略型'}
-          </div>
-          <div className="px-2 py-2 rounded-lg bg-purple-500/10 text-purple-200 font-bold border border-purple-400/30 text-center">
-            📢 {isEn ? 'Voice & Influence' : '表达传播型'}
-          </div>
-          <div className="px-2 py-2 rounded-lg bg-rose-500/10 text-rose-200 font-bold border border-rose-400/30 text-center">
-            🔥 {isEn ? 'Pioneer & Disruptor' : '开创破局型'}
-          </div>
-          <div className="px-2 py-2 rounded-lg bg-emerald-500/10 text-emerald-200 font-bold border border-emerald-400/30 text-center">
-            🤝 {isEn ? 'Trust & Mentor' : '信任导师型'}
-          </div>
-          <div className="px-2 py-2 rounded-lg bg-orange-500/10 text-orange-200 font-bold border border-orange-400/30 text-center">
-            🎯 {isEn ? 'Execution & Results' : '实战结果型'}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+          {Object.values(IP_FAMILIES).map((fam) => {
+            const displayName = isEn ? (IP_FAMILIES_EN[fam.id]?.name || fam.name) : fam.name;
+            return (
+              <div
+                key={fam.id}
+                className="p-2 rounded-xl bg-[#0E101B] border border-amber-500/20 hover:border-amber-400/40 transition flex items-center gap-2 text-left shadow-sm"
+              >
+                <div className="w-9 h-9 rounded-lg overflow-hidden border border-amber-400/40 shrink-0 bg-slate-950 shadow-inner">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={fam.avatarUrl || `/avatars/${fam.id}.png`}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-amber-200 text-[11px] truncate leading-tight">
+                    {displayName}
+                  </div>
+                  <div className="text-[9px] text-slate-400 truncate mt-0.5">
+                    {fam.stars.slice(0, 3).join(' · ')}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

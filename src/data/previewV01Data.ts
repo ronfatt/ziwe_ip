@@ -27,6 +27,7 @@ export interface IPFamilyInfo {
   bgGradient: string;
   badgeBorder: string;
   iconName: string;
+  avatarUrl?: string;
 }
 
 // 1. 六大核心 IP 家族 (Section 12 - 17, 38)
@@ -44,7 +45,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#D97706', // amber-600
     bgGradient: 'from-amber-500 via-amber-600 to-yellow-600',
     badgeBorder: 'border-amber-200 bg-amber-50 text-amber-900',
-    iconName: 'Crown'
+    iconName: 'Crown',
+    avatarUrl: '/avatars/leader_authority.png'
   },
   strategy_intelligence: {
     id: 'strategy_intelligence',
@@ -59,7 +61,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#2563EB', // blue-600
     bgGradient: 'from-blue-600 via-indigo-600 to-cyan-600',
     badgeBorder: 'border-blue-200 bg-blue-50 text-blue-900',
-    iconName: 'Brain'
+    iconName: 'Brain',
+    avatarUrl: '/avatars/strategy_intelligence.png'
   },
   communication_influence: {
     id: 'communication_influence',
@@ -74,7 +77,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#9333EA', // purple-600
     bgGradient: 'from-purple-600 via-fuchsia-600 to-pink-600',
     badgeBorder: 'border-purple-200 bg-purple-50 text-purple-900',
-    iconName: 'Megaphone'
+    iconName: 'Megaphone',
+    avatarUrl: '/avatars/communication_influence.png'
   },
   disruption_pioneer: {
     id: 'disruption_pioneer',
@@ -89,7 +93,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#E11D48', // rose-600
     bgGradient: 'from-rose-600 via-red-600 to-orange-600',
     badgeBorder: 'border-rose-200 bg-rose-50 text-rose-900',
-    iconName: 'Flame'
+    iconName: 'Flame',
+    avatarUrl: '/avatars/disruption_pioneer.png'
   },
   trust_mentor: {
     id: 'trust_mentor',
@@ -104,7 +109,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#0D9488', // teal-600
     bgGradient: 'from-teal-600 via-emerald-600 to-green-600',
     badgeBorder: 'border-teal-200 bg-teal-50 text-teal-900',
-    iconName: 'HeartHandshake'
+    iconName: 'HeartHandshake',
+    avatarUrl: '/avatars/trust_mentor.png'
   },
   execution_results: {
     id: 'execution_results',
@@ -119,7 +125,8 @@ export const IP_FAMILIES: Record<IPFamilyId, IPFamilyInfo> = {
     accentColor: '#EA580C', // orange-600
     bgGradient: 'from-orange-600 via-amber-600 to-yellow-600',
     badgeBorder: 'border-orange-200 bg-orange-50 text-orange-900',
-    iconName: 'Target'
+    iconName: 'Target',
+    avatarUrl: '/avatars/execution_results.png'
   }
 };
 
