@@ -8,8 +8,14 @@ import confetti from 'canvas-confetti';
 
 export default function AnalyzeAnimationPage() {
   const router = useRouter();
-  const { runAnalysis, activePresetId } = useAssessmentStore();
-  const [currentStepText, setCurrentStepText] = useState('正在校准出生干支与八字日柱坐标...');
+  const { runAnalysis, activePresetId, language } = useAssessmentStore();
+  const isEn = language === 'en';
+
+  const [currentStepText, setCurrentStepText] = useState(
+    isEn
+      ? 'Calibrating birth stems and BaZi Day Pillar coordinates...'
+      : '正在校准出生干支与八字日柱坐标...'
+  );
   const [starDiscovered, setStarDiscovered] = useState(false);
   const [progress, setProgress] = useState(20);
 
@@ -18,18 +24,30 @@ export default function AnalyzeAnimationPage() {
 
     const t1 = setTimeout(() => {
       setProgress(45);
-      setCurrentStepText('正在读取紫微命宫主星与对宫迁移宫原型...');
+      setCurrentStepText(
+        isEn
+          ? 'Reading Ziwei Life Palace and Migration Palace archetypes...'
+          : '正在读取紫微命宫主星与对宫迁移宫原型...'
+      );
     }, 600);
 
     const t2 = setTimeout(() => {
       setProgress(72);
-      setCurrentStepText('正在匹配六大核心 IP 家族与优势原型...');
+      setCurrentStepText(
+        isEn
+          ? 'Matching 6 Core IP Archetype Families and strategic strengths...'
+          : '正在匹配六大核心 IP 家族与优势原型...'
+      );
     }, 1300);
 
     const t3 = setTimeout(() => {
       setProgress(92);
       setStarDiscovered(true);
-      setCurrentStepText('计算八字喜用神，激活五行 IP 能量放大器...');
+      setCurrentStepText(
+        isEn
+          ? 'Calculating BaZi Useful Element & activating Five Elements IP Booster...'
+          : '计算八字喜用神，激活五行 IP 能量放大器...'
+      );
       // Fire celebratory confetti!
       try {
         confetti({
@@ -53,7 +71,7 @@ export default function AnalyzeAnimationPage() {
       clearTimeout(t3);
       clearTimeout(t4);
     };
-  }, [runAnalysis, router]);
+  }, [runAnalysis, router, isEn]);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 max-w-md mx-auto">
@@ -84,11 +102,13 @@ export default function AnalyzeAnimationPage() {
         <div className="space-y-2 relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-[11px] font-bold text-amber-300">
             <Zap className="w-3 h-3 fill-amber-300 text-amber-300" />
-            <span>命盘原型深度解码中</span>
+            <span>{isEn ? 'Decoding Destiny Archetype' : '命盘原型深度解码中'}</span>
           </div>
 
           <h2 className="text-lg font-black text-white tracking-tight">
-            {starDiscovered ? '🎉 核心天赋原型匹配成功！' : '正在解码你的个人品牌基因...'}
+            {starDiscovered
+              ? (isEn ? '🎉 Core Talent Archetype Matched!' : '🎉 核心天赋原型匹配成功！')
+              : (isEn ? 'Decoding Your Personal Brand DNA...' : '正在解码你的个人品牌基因...')}
           </h2>
 
           <p className="text-xs text-slate-300 h-8 font-medium transition-all leading-relaxed">
@@ -105,7 +125,9 @@ export default function AnalyzeAnimationPage() {
             />
           </div>
           <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400">
-            <span className="text-amber-400/80">易玺老师 · 个人品牌战略</span>
+            <span className="text-amber-400/80">
+              {isEn ? 'Master Yixi · Brand Strategy' : '易玺老师 · 个人品牌战略'}
+            </span>
             <span className="text-amber-300">{progress}%</span>
           </div>
         </div>
@@ -113,7 +135,11 @@ export default function AnalyzeAnimationPage() {
         {/* Bottom security assurance */}
         <div className="pt-2 text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1.5 border-t border-slate-800/80">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-          <span>本地沙盒运算 · 科学心智归纳 · 严守隐私</span>
+          <span>
+            {isEn
+              ? 'Local Sandbox Deduction · Privacy Strictly Preserved'
+              : '本地沙盒运算 · 科学心智归纳 · 严守隐私'}
+          </span>
         </div>
       </div>
     </div>

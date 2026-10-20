@@ -26,7 +26,8 @@ import { Gender } from '@/types';
 
 export default function HomePage() {
   const router = useRouter();
-  const { quickAnalyzeFromBirth } = useAssessmentStore();
+  const { quickAnalyzeFromBirth, language } = useAssessmentStore();
+  const isEn = language === 'en';
 
   // Mobile Web App Input State
   const [displayName, setDisplayName] = useState('');
@@ -35,26 +36,26 @@ export default function HomePage() {
   const [birthTime, setBirthTime] = useState('12:00');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 12 时辰快捷定义表
+  // 12 时辰快捷定义表 (Bilingual)
   const SHICHEN_LIST = [
-    { label: '子时', time: '00:00', desc: '23:00-01:00' },
-    { label: '丑时', time: '02:00', desc: '01:00-03:00' },
-    { label: '寅时', time: '04:00', desc: '03:00-05:00' },
-    { label: '卯时', time: '06:00', desc: '05:00-07:00' },
-    { label: '辰时', time: '08:00', desc: '07:00-09:00' },
-    { label: '巳时', time: '10:00', desc: '09:00-11:00' },
-    { label: '午时', time: '12:00', desc: '11:00-13:00' },
-    { label: '未时', time: '14:00', desc: '13:00-15:00' },
-    { label: '申时', time: '16:00', desc: '15:00-17:00' },
-    { label: '酉时', time: '18:00', desc: '17:00-19:00' },
-    { label: '戌时', time: '20:00', desc: '19:00-21:00' },
-    { label: '亥时', time: '22:00', desc: '21:00-23:00' },
+    { label: isEn ? 'Zi Hour' : '子时', time: '00:00', desc: '23:00-01:00' },
+    { label: isEn ? 'Chou' : '丑时', time: '02:00', desc: '01:00-03:00' },
+    { label: isEn ? 'Yin' : '寅时', time: '04:00', desc: '03:00-05:00' },
+    { label: isEn ? 'Mao' : '卯时', time: '06:00', desc: '05:00-07:00' },
+    { label: isEn ? 'Chen' : '辰时', time: '08:00', desc: '07:00-09:00' },
+    { label: isEn ? 'Si' : '巳时', time: '10:00', desc: '09:00-11:00' },
+    { label: isEn ? 'Wu (Noon)' : '午时', time: '12:00', desc: '11:00-13:00' },
+    { label: isEn ? 'Wei' : '未时', time: '14:00', desc: '13:00-15:00' },
+    { label: isEn ? 'Shen' : '申时', time: '16:00', desc: '15:00-17:00' },
+    { label: isEn ? 'You' : '酉时', time: '18:00', desc: '17:00-19:00' },
+    { label: isEn ? 'Xu' : '戌时', time: '20:00', desc: '19:00-21:00' },
+    { label: isEn ? 'Hai' : '亥时', time: '22:00', desc: '21:00-23:00' },
   ];
 
   const handleStartAnalysis = (e: React.FormEvent) => {
     e.preventDefault();
     if (!birthDate) {
-      alert('请选择您的出生日期');
+      alert(isEn ? 'Please select your birth date' : '请选择您的出生日期');
       return;
     }
     setIsSubmitting(true);
@@ -97,30 +98,41 @@ export default function HomePage() {
           {/* Keynote Title: 紫微 IP DNA */}
           <div>
             <h1 className="text-3xl sm:text-4xl font-serif font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#FFF4D2] via-[#F6D268] to-[#D5A021]">
-              紫微 IP DNA
+              ZIWEI IP DNA
             </h1>
             {/* Golden divider line */}
             <div className="h-0.5 w-16 bg-gradient-to-r from-amber-400 via-rose-500 to-transparent mt-1.5" />
           </div>
 
-          {/* Keynote Subtitle: 从命盘找到你最有影响力的个人品牌 */}
+          {/* Keynote Subtitle */}
           <h2 className="text-sm sm:text-base font-bold text-[#F3E5C8] tracking-tight leading-snug">
-            从命盘找到你最有影响力的个人品牌
+            {isEn
+              ? 'Discover Your Most Influential Personal Brand from Your Destiny Chart'
+              : '从命盘找到你最有影响力的个人品牌'}
           </h2>
 
-          {/* Keynote Quote: 不是教你成为别人，而是找出你最值得被看见的那一面 */}
+          {/* Keynote Quote */}
           <p className="text-xs text-slate-300 font-normal leading-relaxed pt-1 border-t border-white/10">
-            不是教你成为别人，<br />
-            而是找出你最值得被看见的那一面。
+            {isEn ? (
+              <>
+                Not to teach you how to imitate others,<br />
+                but to uncover the truest version of you that deserves to be seen.
+              </>
+            ) : (
+              <>
+                不是教你成为别人，<br />
+                而是找出你最值得被看见的那一面。
+              </>
+            )}
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-2 text-[11px]">
             <span className="text-amber-300 font-bold flex items-center gap-1 bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-full">
               <Sparkles className="w-3 h-3 text-amber-300" />
-              找到你的光，放大你的价值
+              {isEn ? 'Find Your Light · Amplify Your Value' : '找到你的光，放大你的价值'}
             </span>
             <span className="text-slate-400 text-[10px]">
-              易玺老师 ｜ 企业风水战略顾问
+              {isEn ? 'Master Yixi | Corporate Feng Shui & Brand Strategist' : '易玺老师 ｜ 企业风水战略顾问'}
             </span>
           </div>
         </div>
@@ -134,11 +146,11 @@ export default function HomePage() {
               <Compass className="w-3.5 h-3.5" />
             </div>
             <h2 className="text-sm font-bold text-white tracking-wide">
-              输入出生资料 · 现场极速推演
+              {isEn ? 'Enter Birth Details · Instant Live Deduction' : '输入出生资料 · 现场极速推演'}
             </h2>
           </div>
           <span className="text-[10px] font-semibold text-amber-400/80 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-full">
-            现场试听课专用
+            {isEn ? 'Workshop Exclusive' : '现场试听课专用'}
           </span>
         </div>
 
@@ -147,20 +159,20 @@ export default function HomePage() {
           <div className="grid grid-cols-5 gap-2.5">
             <div className="col-span-3 space-y-1">
               <label className="block text-xs font-semibold text-slate-300">
-                姓名 / 英文名
+                {isEn ? 'Full Name / English Name' : '姓名 / 英文名'}
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="如：Calven / 奕凡"
+                placeholder={isEn ? 'e.g. Calven / Evan' : '如：Calven / 奕凡'}
                 className="w-full rounded-xl bg-[#0F111D] border border-slate-700/80 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-white placeholder:text-slate-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition"
               />
             </div>
 
             <div className="col-span-2 space-y-1">
               <label className="block text-xs font-semibold text-slate-300">
-                性别
+                {isEn ? 'Gender' : '性别'}
               </label>
               <div className="flex bg-[#0F111D] border border-slate-700/80 rounded-xl p-1 h-[42px] items-center">
                 <button
@@ -172,7 +184,7 @@ export default function HomePage() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  男
+                  {isEn ? 'Male' : '男'}
                 </button>
                 <button
                   type="button"
@@ -183,7 +195,7 @@ export default function HomePage() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  女
+                  {isEn ? 'Female' : '女'}
                 </button>
               </div>
             </div>
@@ -193,9 +205,12 @@ export default function HomePage() {
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-300">
-                出生日期（阳历 / 公历）<span className="text-rose-400 ml-0.5">*</span>
+                {isEn ? 'Date of Birth (Solar / Gregorian)' : '出生日期（阳历 / 公历）'}
+                <span className="text-rose-400 ml-0.5">*</span>
               </label>
-              <span className="text-[10px] text-amber-400/80">系统自动排布农历与天干地支</span>
+              <span className="text-[10px] text-amber-400/80">
+                {isEn ? 'Auto calculates Lunar & BaZi Four Pillars' : '系统自动排布农历与天干地支'}
+              </span>
             </div>
             <input
               type="date"
@@ -210,13 +225,15 @@ export default function HomePage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-300">
-                出生时辰 / 时间
+                {isEn ? 'Birth Hour / Shichen' : '出生时辰 / 时间'}
               </label>
-              <span className="text-[10px] text-slate-400">可一键点选时辰，或保留默认午时</span>
+              <span className="text-[10px] text-slate-400">
+                {isEn ? 'Select Shichen pill below or keep default' : '可一键点选时辰，或保留默认午时'}
+              </span>
             </div>
 
             {/* 12时辰一键胶囊选择栏 */}
-            <div className="grid grid-cols-6 sm:grid-cols-6 gap-1">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
               {SHICHEN_LIST.map((sc) => {
                 const isSelected = birthTime.startsWith(sc.time.slice(0, 2));
                 return (
@@ -239,7 +256,9 @@ export default function HomePage() {
 
             {/* 精确时间微调 */}
             <div className="flex items-center gap-2 pt-1">
-              <span className="text-[11px] text-slate-400 shrink-0">精确钟表时间：</span>
+              <span className="text-[11px] text-slate-400 shrink-0">
+                {isEn ? 'Exact Clock Time:' : '精确钟表时间：'}
+              </span>
               <input
                 type="time"
                 value={birthTime}
@@ -256,16 +275,22 @@ export default function HomePage() {
             className="w-full mt-2 py-3.5 rounded-xl btn-solar-gold font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 cursor-pointer shadow-xl shadow-rose-950/50"
           >
             <Sparkles className="w-4 h-4 fill-amber-200 text-amber-200" />
-            <span>{isSubmitting ? '正在结合命盘推演 IP DNA...' : '开始测试我的 IP DNA →'}</span>
+            <span>
+              {isSubmitting
+                ? (isEn ? 'Deducing IP DNA from Destiny Chart...' : '正在结合命盘推演 IP DNA...')
+                : (isEn ? 'Discover My IP DNA →' : '开始测试我的 IP DNA →')}
+            </span>
           </button>
         </form>
 
         <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
           <span className="flex items-center gap-1 text-emerald-400 font-medium">
             <ShieldCheck className="w-3.5 h-3.5" />
-            大耕老师正统命理算法 · 隐私保护
+            {isEn ? 'Traditional Engine · PDPA Privacy Guaranteed' : '大耕老师正统命理算法 · 隐私保护'}
           </span>
-          <span className="text-amber-400/80 font-mono">2–3 分钟测出</span>
+          <span className="text-amber-400/80 font-mono">
+            {isEn ? '2–3 Mins Result' : '2–3 分钟测出'}
+          </span>
         </div>
       </div>
 
@@ -274,10 +299,10 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-white flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-amber-400" />
-            Preview 核心推演公式
+            {isEn ? 'Preview Core Deduction Formula' : 'Preview 核心推演公式'}
           </span>
           <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-md">
-            三大能量支柱
+            {isEn ? '3 Energy Pillars' : '三大能量支柱'}
           </span>
         </div>
 
@@ -285,74 +310,96 @@ export default function HomePage() {
           {/* 1. 命宫主星 */}
           <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-amber-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-amber-400 block">命宫主星</span>
-              <span className="text-xs font-black text-white block">我是谁</span>
+              <span className="text-[10px] font-bold text-amber-400 block">
+                {isEn ? 'Life Palace Star' : '命宫主星'}
+              </span>
+              <span className="text-xs font-black text-white block">
+                {isEn ? 'Who I Am' : '我是谁'}
+              </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 leading-tight">
-              核心优势与内在原型
+              {isEn ? 'Core Strengths & Intrinsic Archetype' : '核心优势与内在原型'}
             </p>
           </div>
 
           {/* 2. 迁移宫主星 */}
           <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-rose-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-rose-400 block">迁移宫主星</span>
-              <span className="text-xs font-black text-white block">别人怎么看我</span>
+              <span className="text-[10px] font-bold text-rose-400 block">
+                {isEn ? 'Migration Star' : '迁移宫主星'}
+              </span>
+              <span className="text-xs font-black text-white block">
+                {isEn ? 'How Others See Me' : '别人怎么看我'}
+              </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 leading-tight">
-              公众感知与外显人设
+              {isEn ? 'Public Perception & External Persona' : '公众感知与外显人设'}
             </p>
           </div>
 
           {/* 3. 八字喜用神 */}
           <div className="p-2.5 rounded-xl bg-[#0D0F1A] border border-amber-500/20 flex flex-col justify-between">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-bold text-amber-300 block">八字喜用神</span>
-              <span className="text-xs font-black text-white block">能量放大</span>
+              <span className="text-[10px] font-bold text-amber-300 block">
+                {isEn ? 'BaZi Useful Element' : '八字喜用神'}
+              </span>
+              <span className="text-xs font-black text-white block">
+                {isEn ? 'Energy Amplifier' : '能量放大'}
+              </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 leading-tight">
-              品牌穿搭与视觉赋能
+              {isEn ? 'Brand Styling & Visual Synergy' : '品牌穿搭与视觉赋能'}
             </p>
           </div>
         </div>
 
         <div className="p-2.5 rounded-xl bg-[#0C0E17] border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
-          <span className="font-bold text-amber-300">💡 为什么是命宫 × 迁移宫？</span>
-          你自己认为的自己，和市场看到的你，不一定完全一样。真正的个人品牌爆发力，是<strong>「核心的你」</strong>与<strong>「市场看到的你」</strong>碰撞出的化学反应。
+          <span className="font-bold text-amber-300">
+            {isEn ? '💡 Why Life Palace × Migration Palace?' : '💡 为什么是命宫 × 迁移宫？'}
+          </span>{' '}
+          {isEn
+            ? 'How you perceive yourself and how the market perceives you are not always identical. True personal brand power comes from the explosive synergy between "Your Core Self" and "What the Market Sees".'
+            : '你自己认为的自己，和市场看到的你，不一定完全一样。真正的个人品牌爆发力，是「核心的你」与「市场看到的你」碰撞出的化学反应。'}
         </div>
       </div>
 
       {/* 4. 六大核心 IP 家族快速认知 */}
       <div className="p-4 rounded-2xl card-obsidian space-y-2.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-white">六大核心 IP 家族原型</span>
-          <span className="text-[10px] text-amber-400">14 主星定位系统</span>
+          <span className="font-bold text-white">
+            {isEn ? '6 Core IP Archetype Families' : '六大核心 IP 家族原型'}
+          </span>
+          <span className="text-[10px] text-amber-400">
+            {isEn ? '14 Stars Positioning System' : '14 主星定位系统'}
+          </span>
         </div>
-        <div className="grid grid-cols-3 gap-1.5 text-[11px]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
           <div className="px-2 py-2 rounded-lg bg-amber-500/10 text-amber-200 font-bold border border-amber-400/30 text-center">
-            👑 领袖权威型
+            👑 {isEn ? 'Leader & Authority' : '领袖权威型'}
           </div>
           <div className="px-2 py-2 rounded-lg bg-blue-500/10 text-blue-200 font-bold border border-blue-400/30 text-center">
-            🧠 智慧策略型
+            🧠 {isEn ? 'Strategy & Intelligence' : '智慧策略型'}
           </div>
           <div className="px-2 py-2 rounded-lg bg-purple-500/10 text-purple-200 font-bold border border-purple-400/30 text-center">
-            📢 表达传播型
+            📢 {isEn ? 'Voice & Influence' : '表达传播型'}
           </div>
           <div className="px-2 py-2 rounded-lg bg-rose-500/10 text-rose-200 font-bold border border-rose-400/30 text-center">
-            🔥 开创破局型
+            🔥 {isEn ? 'Pioneer & Disruptor' : '开创破局型'}
           </div>
           <div className="px-2 py-2 rounded-lg bg-emerald-500/10 text-emerald-200 font-bold border border-emerald-400/30 text-center">
-            🤝 信任导师型
+            🤝 {isEn ? 'Trust & Mentor' : '信任导师型'}
           </div>
           <div className="px-2 py-2 rounded-lg bg-orange-500/10 text-orange-200 font-bold border border-orange-400/30 text-center">
-            🎯 实战结果型
+            🎯 {isEn ? 'Execution & Results' : '实战结果型'}
           </div>
         </div>
       </div>
 
       {/* 5. 底部版权 */}
       <div className="text-center text-[10px] text-slate-500 py-1">
-        紫微 IP DNA 战略系统 · Preview V0.1 · 易玺老师试听课专研
+        {isEn
+          ? 'ZIWEI IP DNA Strategic System · Preview V0.1 · Master Yixi Workshop Exclusive'
+          : '紫微 IP DNA 战略系统 · Preview V0.1 · 易玺老师试听课专研'}
       </div>
     </div>
   );

@@ -111,11 +111,29 @@ const getInitialState = (): AssessmentState => {
   };
 };
 
-export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
-  ...getInitialState(),
-  language: 'zh-CN',
+export const useAssessmentStore = create<AssessmentStore>((set, get) => {
+  let initialLanguage: Language = 'zh-CN';
+  if (typeof window !== 'undefined') {
+    try {
+      const savedLang = localStorage.getItem('ziwei_preferred_language') as Language;
+      if (savedLang === 'en' || savedLang === 'zh-CN' || savedLang === 'ms') {
+        initialLanguage = savedLang;
+      }
+    } catch (e) {}
+  }
 
-  setLanguage: (lang) => set({ language: lang }),
+  return {
+    ...getInitialState(),
+    language: initialLanguage,
+
+    setLanguage: (lang) => {
+      set({ language: lang });
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('ziwei_preferred_language', lang);
+        } catch (e) {}
+      }
+    },
 
   setStep: (step) => {
     set({ currentStep: step });
@@ -324,4 +342,5 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => ({
       localStorage.setItem(STORAGE_KEY, JSON.stringify(get()));
     }
   }
-}));
+};
+});

@@ -9,6 +9,7 @@ import { Sparkles, Compass, FileText, Users, User } from 'lucide-react';
 export const Navbar = () => {
   const pathname = usePathname();
   const { language, setLanguage } = useAssessmentStore();
+  const isEn = language === 'en';
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#08090E]/90 backdrop-blur-md border-b border-amber-500/20 shadow-md shadow-black/40">
@@ -25,10 +26,10 @@ export const Navbar = () => {
           </div>
           <div className="flex flex-col">
             <span className="text-[14px] font-black tracking-tight text-white leading-none flex items-center gap-1">
-              紫微 IP DNA<span className="text-[10px] text-amber-400 font-mono">™</span>
+              ZIWEI IP DNA<span className="text-[10px] text-amber-400 font-mono">™</span>
             </span>
             <span className="text-[9px] text-amber-400/90 font-bold tracking-wider mt-0.5 uppercase">
-              易玺老师 · 个人品牌战略
+              {isEn ? 'Master Yixi · Brand Strategy' : '易玺老师 · 个人品牌战略'}
             </span>
           </div>
         </Link>
@@ -59,7 +60,7 @@ export const Navbar = () => {
             href="/report"
             className="text-[11px] font-bold px-2.5 py-1 rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition shadow-2xs"
           >
-            示例报告
+            {isEn ? 'Demo Report' : '示例报告'}
           </Link>
         </div>
       </div>
@@ -69,12 +70,14 @@ export const Navbar = () => {
 
 export const MobileBottomNav = () => {
   const pathname = usePathname();
+  const { language } = useAssessmentStore();
+  const isEn = language === 'en';
 
   const items = [
-    { href: '/', label: '测算', icon: Compass },
-    { href: '/report', label: '报告', icon: FileText },
-    { href: '/consultation', label: '预约', icon: Users },
-    { href: '/dashboard', label: '我的', icon: User },
+    { href: '/', label: isEn ? 'Assess' : '测算', icon: Compass },
+    { href: '/report', label: isEn ? 'Report' : '报告', icon: FileText },
+    { href: '/consultation', label: isEn ? 'Consult' : '预约', icon: Users },
+    { href: '/dashboard', label: isEn ? 'Profile' : '我的', icon: User },
   ];
 
   return (
@@ -104,14 +107,19 @@ export const MobileBottomNav = () => {
 };
 
 export const Footer = () => {
+  const { language } = useAssessmentStore();
+  const isEn = language === 'en';
+
   return (
     <footer className="border-t border-slate-800/80 bg-[#07080D] text-slate-400 text-xs py-6 pb-20 md:pb-6">
       <div className="max-w-lg md:max-w-xl mx-auto px-4 text-center space-y-1.5">
         <p className="text-amber-300/80 text-xs font-semibold">
-          紫微 IP DNA™ · 找到你的光，放大你的价值
+          {isEn ? 'ZIWEI IP DNA™ · Find Your Light, Amplify Your Value' : '紫微 IP DNA™ · 找到你的光，放大你的价值'}
         </p>
         <p className="text-[10px] text-slate-500">
-          易玺老师｜企业风水战略顾问 · 现场试听课专用测试系统
+          {isEn
+            ? 'Master Yixi | Corporate Feng Shui & Brand Strategist · Workshop Live Assessment'
+            : '易玺老师｜企业风水战略顾问 · 现场试听课专用测试系统'}
         </p>
         <div className="text-[10px] text-slate-600">
           © 2026 ZIWEI IP DNA™. All rights reserved.

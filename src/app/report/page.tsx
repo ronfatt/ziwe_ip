@@ -6,6 +6,11 @@ import { useAssessmentStore } from '@/store/assessmentStore';
 import { calculateZiweiIpDnaPreview, PreviewV01Result } from '@/lib/previewEngine';
 import { IP_FAMILIES, ELEMENT_BOOSTERS, SYSTEM_DISCLAIMER } from '@/data/previewV01Data';
 import {
+  getLocalizedPreviewResult,
+  IP_FAMILIES_EN,
+  SYSTEM_DISCLAIMER_EN
+} from '@/data/i18nPreviewData';
+import {
   Sparkles,
   Share2,
   Calendar,
@@ -34,7 +39,8 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function ReportSummaryPage() {
-  const { birthInfo, previewV01Result } = useAssessmentStore();
+  const { birthInfo, previewV01Result, language } = useAssessmentStore();
+  const isEn = language === 'en';
 
   // 始终根据当前实际输入的出生日期重新校验，防止读取旧缓存
   const isCacheValid =
@@ -43,17 +49,26 @@ export default function ReportSummaryPage() {
     previewV01Result.user.birth_date === birthInfo.birthDate &&
     previewV01Result.user.birth_time === birthInfo.birthTime;
 
-  const result: PreviewV01Result = isCacheValid
+  const rawResult: PreviewV01Result = isCacheValid
     ? previewV01Result
     : calculateZiweiIpDnaPreview({
-        name: birthInfo.displayName || '学员',
+        name: birthInfo.displayName || (isEn ? 'Student' : '学员'),
         gender: birthInfo.gender || 'male',
         birthDate: birthInfo.birthDate || '1995-08-18',
         birthTime: birthInfo.birthTime || '12:00'
       });
 
+  const result: PreviewV01Result = getLocalizedPreviewResult(rawResult, isEn);
   const { user, ziwei, bazi } = result;
-  const familyInfo = IP_FAMILIES[ziwei.ming_palace.ip_family_id] || IP_FAMILIES.leader_authority;
+
+  const rawFamilyInfo = IP_FAMILIES[ziwei.ming_palace.ip_family_id] || IP_FAMILIES.leader_authority;
+  const enFamilyInfo = IP_FAMILIES_EN[ziwei.ming_palace.ip_family_id] || IP_FAMILIES_EN.leader_authority;
+
+  const familyInfo = isEn ? {
+    ...rawFamilyInfo,
+    ...enFamilyInfo
+  } : rawFamilyInfo;
+
   const boosterInfo = ELEMENT_BOOSTERS[bazi.useful_element] || ELEMENT_BOOSTERS.fire;
 
   // Family Icon Dynamic Resolver
@@ -75,7 +90,7 @@ export default function ReportSummaryPage() {
     }
   };
 
-  const FamilyIcon = getFamilyIcon(familyInfo.iconName);
+  const FamilyIcon = getFamilyIcon(rawFamilyInfo.iconName);
 
   // Polaroid Share Modal State
   const [showShareModal, setShowShareModal] = useState(false);
@@ -111,6 +126,28 @@ export default function ReportSummaryPage() {
     }
   };
 
+  const lockedDimensions = isEn
+    ? [
+        '🔒 Core Personality Motives',
+        '🔒 Career Palace · Commercial Value',
+        '🔒 Wealth Palace · Monetization Path',
+        '🔒 Body Palace · Life Second Half',
+        '🔒 3-Direction 4-Square Structure',
+        '🔒 Hidden Mutagen Catalysts',
+        '🔒 Audience Persona & Pricing',
+        '🔒 2026-2027 Breakthrough Major Period'
+      ]
+    : [
+        '🔒 核心人格深层动机',
+        '🔒 官禄宫 · 商业价值',
+        '🔒 财帛宫 · 变现路径',
+        '🔒 身宫 · 人生后半场',
+        '🔒 三方四正 · 资源格局',
+        '🔒 生年/命宫四化暗线',
+        '🔒 客群画像与收费定价',
+        '🔒 2026-2027 爆发大限'
+      ];
+
   return (
     <div className="min-h-[calc(100vh-3.5rem)] max-w-lg md:max-w-xl mx-auto px-4 py-4 md:py-6 space-y-4">
       {/* 1. TOP STATUS META BAR */}
@@ -118,7 +155,7 @@ export default function ReportSummaryPage() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
           <span className="font-bold text-amber-300 flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 fill-amber-300" />
-            紫微 IP DNA
+            ZIWEI IP DNA
           </span>
           <span className="hidden sm:inline text-slate-600">|</span>
           <span className="text-[11px] text-slate-400 font-mono">
@@ -132,7 +169,7 @@ export default function ReportSummaryPage() {
           className="flex items-center gap-1 text-[11px] font-bold text-amber-300 hover:text-amber-200 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-400/30 shadow-sm transition active:scale-95 cursor-pointer shrink-0"
         >
           <Share2 className="w-3 h-3 text-amber-300" />
-          <span>生成分享海报</span>
+          <span>{isEn ? 'Share Poster' : '生成分享海报'}</span>
         </button>
       </div>
 
@@ -159,15 +196,17 @@ export default function ReportSummaryPage() {
 
         <div className="relative z-10 max-w-[74%] space-y-1.5">
           <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-            <span className="font-bold text-amber-300">{user.name} 的紫微 IP DNA</span>
+            <span className="font-bold text-amber-300">
+              {user.name} {isEn ? "'s ZIWEI IP DNA" : '的紫微 IP DNA'}
+            </span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 font-mono text-amber-200 font-bold">
-              {ziwei.ming_palace.palace_pillar}宫 · {ziwei.ming_palace.bureau_name}
+              {ziwei.ming_palace.palace_pillar}{isEn ? ' Palace' : '宫'} · {ziwei.ming_palace.bureau_name}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[11px] text-slate-400 font-semibold block">
-              核心 IP 原型家族
+            <span className="text-[11px] text-slate-400 font-semibold block uppercase tracking-wider">
+              {isEn ? 'Core IP Archetype Family' : '核心 IP 原型家族'}
             </span>
             <h1 className="text-2xl sm:text-3xl font-serif font-black tracking-tight text-gold-gradient flex items-center gap-2">
               <span>{familyInfo.name}</span>
@@ -183,7 +222,9 @@ export default function ReportSummaryPage() {
         <div className="pt-2 border-t border-amber-500/20">
           <div className="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
             <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-            <span className="text-amber-200/90 font-medium">你的核心影响力基因：</span>
+            <span className="text-amber-200/90 font-medium">
+              {isEn ? 'Your Core Influence DNA:' : '你的核心影响力基因：'}
+            </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {familyInfo.keywords.map((kw, i) => (
@@ -203,12 +244,14 @@ export default function ReportSummaryPage() {
         <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-400/30">
-              命
+              {isEn ? 'Ming' : '命'}
             </div>
             <div>
-              <h2 className="text-sm font-black text-white">你的命宫</h2>
+              <h2 className="text-sm font-black text-white">
+                {isEn ? 'Life Palace (Ming)' : '你的命宫'}
+              </h2>
               <span className="text-[10px] text-slate-400">
-                {ziwei.ming_palace.palace_branch}位 · 决定你的 IP 内核（我是谁）
+                {ziwei.ming_palace.palace_branch} {isEn ? 'Branch · Determines IP Core (Who I Am)' : '位 · 决定你的 IP 内核（我是谁）'}
               </span>
             </div>
           </div>
@@ -216,11 +259,11 @@ export default function ReportSummaryPage() {
           <div className="flex items-center gap-1">
             {ziwei.ming_palace.borrowed_from_migration && (
               <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-400/40 px-2 py-0.5 rounded-md">
-                借对宫
+                {isEn ? 'Opposite Borrowed' : '借对宫'}
               </span>
             )}
             <span className="text-[11px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2.5 py-0.5 rounded-md">
-              核心特质
+              {isEn ? 'Core Strengths' : '核心特质'}
             </span>
           </div>
         </div>
@@ -229,13 +272,15 @@ export default function ReportSummaryPage() {
         <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#171A29] via-[#121422] to-[#0D0F19] border border-amber-500/25 flex items-center justify-between">
           <div className="space-y-1">
             <div className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 flex-wrap">
-              <span>命宫主星：</span>
+              <span>{isEn ? 'Life Palace Stars:' : '命宫主星：'}</span>
               <span className="text-white font-bold text-sm">
                 {ziwei.ming_palace.stars.join(' · ')}
               </span>
               {ziwei.ming_palace.borrowed_from_migration && (
                 <span className="text-[10px] text-amber-400/80 font-normal">
-                  （本宫空宫，依南派法门借对宫论述）
+                  {isEn
+                    ? '(Empty palace; analyzed via opposite Migration Palace)'
+                    : '（本宫空宫，依南派法门借对宫论述）'}
                 </span>
               )}
             </div>
@@ -249,13 +294,13 @@ export default function ReportSummaryPage() {
 
             {/* 四化入命加持标签 */}
             {ziwei.ming_palace.mutagens && ziwei.ming_palace.mutagens.length > 0 && (
-              <div className="flex gap-1 pt-0.5">
+              <div className="flex flex-wrap gap-1 pt-0.5">
                 {ziwei.ming_palace.mutagens.map((mut, idx) => (
                   <span
                     key={idx}
                     className="text-[10px] font-black px-2 py-0.5 rounded bg-rose-500/20 border border-rose-400/40 text-rose-300"
                   >
-                    生年{mut}
+                    {isEn ? mut : `生年${mut}`}
                   </span>
                 ))}
               </div>
@@ -271,7 +316,7 @@ export default function ReportSummaryPage() {
         <div className="space-y-2 pt-1">
           <span className="text-xs font-bold text-white flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
-            你的核心优势：
+            {isEn ? 'Your Core Strategic Advantages:' : '你的核心优势：'}
           </span>
           <div className="space-y-1.5">
             {ziwei.ming_palace.core_advantages.map((point, index) => (
@@ -292,17 +337,19 @@ export default function ReportSummaryPage() {
         <div className="flex items-center justify-between pb-2 border-b border-rose-500/20">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center font-bold text-xs border border-rose-400/30">
-              迁
+              {isEn ? 'Qian' : '迁'}
             </div>
             <div>
-              <h2 className="text-sm font-black text-white">你的迁移宫</h2>
+              <h2 className="text-sm font-black text-white">
+                {isEn ? 'Migration Palace (Qian)' : '你的迁移宫'}
+              </h2>
               <span className="text-[10px] text-slate-400">
-                {ziwei.migration_palace.palace_branch}位（对宫）· 决定你的 IP 外显与公众感知
+                {ziwei.migration_palace.palace_branch} {isEn ? 'Branch (Opposite) · Determines External Persona' : '位（对宫）· 决定你的 IP 外显与公众感知'}
               </span>
             </div>
           </div>
           <span className="text-[11px] font-bold text-rose-300 bg-rose-500/15 border border-rose-400/30 px-2.5 py-0.5 rounded-md">
-            公众感知
+            {isEn ? 'Public Persona' : '公众感知'}
           </span>
         </div>
 
@@ -310,7 +357,7 @@ export default function ReportSummaryPage() {
         <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#1E121E] via-[#14121F] to-[#0D0F19] border border-rose-500/25 flex items-center justify-between">
           <div className="space-y-1">
             <div className="text-xs text-slate-400 font-semibold mb-0.5">
-              迁移宫主星：
+              {isEn ? 'Migration Stars:' : '迁移宫主星：'}
               <span className="text-white font-bold ml-1 text-sm">
                 {ziwei.migration_palace.stars.join(' · ')}
               </span>
@@ -321,13 +368,13 @@ export default function ReportSummaryPage() {
 
             {/* 四化入迁移加持标签 */}
             {ziwei.migration_palace.mutagens && ziwei.migration_palace.mutagens.length > 0 && (
-              <div className="flex gap-1 pt-0.5">
+              <div className="flex flex-wrap gap-1 pt-0.5">
                 {ziwei.migration_palace.mutagens.map((mut, idx) => (
                   <span
                     key={idx}
                     className="text-[10px] font-black px-2 py-0.5 rounded bg-rose-500/20 border border-rose-400/40 text-rose-300"
                   >
-                    生年{mut}
+                    {isEn ? mut : `生年${mut}`}
                   </span>
                 ))}
               </div>
@@ -343,7 +390,7 @@ export default function ReportSummaryPage() {
         <div className="space-y-2 pt-1">
           <span className="text-xs font-bold text-white flex items-center gap-1.5">
             <Target className="w-3.5 h-3.5 text-rose-400" />
-            市场比较容易先看到你的：
+            {isEn ? 'What the Market Registers First:' : '市场比较容易先看到你的：'}
           </span>
           <div className="grid grid-cols-2 gap-1.5 pb-1">
             {ziwei.migration_palace.keywords.map((kw, i) => (
@@ -378,13 +425,13 @@ export default function ReportSummaryPage() {
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[10px] font-bold text-amber-300">
             <Sparkles className="w-3 h-3 text-amber-300 fill-amber-300" />
-            命迁一线 · 专属碰撞总结
+            {isEn ? 'Life × Migration Axis · Strategic Synthesis' : '命迁一线 · 专属碰撞总结'}
           </span>
           <span className="text-[10px] font-mono text-amber-400/80">IP DNA COLLISION</span>
         </div>
 
         <h3 className="text-lg font-black text-gold-gradient leading-snug tracking-tight">
-          {ziwei.collision_summary.split('。')[0]}。
+          {ziwei.collision_summary.split(isEn ? '.' : '。')[0]}{isEn ? '.' : '。'}
         </h3>
 
         <div className="p-3.5 rounded-xl bg-[#0B0D17]/80 border border-slate-800 text-xs text-slate-300 leading-relaxed font-normal space-y-2.5">
@@ -392,12 +439,16 @@ export default function ReportSummaryPage() {
 
           {/* 生年四化入命迁实战指引 */}
           <div className="p-2.5 rounded-lg bg-amber-500/15 border border-amber-400/25 text-amber-200 text-[11px] leading-relaxed">
-            <span className="font-bold text-amber-300 block mb-0.5">⚡ 四化赋能密码（大耕老师：起于忌，终于禄）：</span>
+            <span className="font-bold text-amber-300 block mb-0.5">
+              {isEn
+                ? '⚡ Mutagen Strategic Key (Master Da Geng Lineage: Arising from Hua-Ji, Culminating in Hua-Lu):'
+                : '⚡ 四化赋能密码（大耕老师：起于忌，终于禄）：'}
+            </span>
             {ziwei.mutagen_insight}
           </div>
 
           <div className="pt-1 border-t border-slate-800 text-amber-300 font-bold text-xs flex items-center gap-1">
-            <span>💡 战略一句话：</span>
+            <span>{isEn ? '💡 Strategic Axiom:' : '💡 战略一句话：'}</span>
             <span>{familyInfo.oneLiner}</span>
           </div>
         </div>
@@ -408,19 +459,21 @@ export default function ReportSummaryPage() {
         <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-400/30">
-              身
+              {isEn ? 'Shen' : '身'}
             </div>
             <div>
               <h2 className="text-sm font-black text-white">
-                隐形的第十三宫 · 身宫在【{ziwei.shen_palace.name}】
+                {isEn
+                  ? `The Hidden 13th Palace · Body Palace in [${ziwei.shen_palace.name}]`
+                  : `隐形的第十三宫 · 身宫在【${ziwei.shen_palace.name}】`}
               </h2>
               <span className="text-[10px] text-slate-400">
-                成年后真正追求的底层价值所在
+                {isEn ? 'True Lifetime Value & Intrinsic Fulfillment in Adulthood' : '成年后真正追求的底层价值所在'}
               </span>
             </div>
           </div>
           <span className="text-[10px] font-bold text-teal-300 bg-teal-500/20 border border-teal-400/30 px-2 py-0.5 rounded">
-            长期主义
+            {isEn ? 'Long-termism' : '长期主义'}
           </span>
         </div>
         <p className="text-xs text-slate-300 leading-relaxed font-medium pt-1">
@@ -433,19 +486,27 @@ export default function ReportSummaryPage() {
         <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-400/30">
-              气
+              {isEn ? 'Qi' : '气'}
             </div>
             <div>
-              <h2 className="text-sm font-black text-white">八字日柱与能量放大器</h2>
-              <span className="text-[10px] text-slate-400">五行喜用神 IP Booster</span>
+              <h2 className="text-sm font-black text-white">
+                {isEn ? 'BaZi Four Pillars & Energy Amplifier' : '八字日柱与能量放大器'}
+              </h2>
+              <span className="text-[10px] text-slate-400">
+                {isEn ? 'Five Elements Useful Element IP Booster' : '五行喜用神 IP Booster'}
+              </span>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-[#0D0F1B] border border-amber-500/25 text-slate-200">
-            <span className="text-amber-400/90 font-sans font-semibold">四柱八字：</span>
-            <span className="text-slate-300">{bazi.year_pillar}年</span>
-            <span className="text-slate-300">{bazi.month_pillar}月</span>
-            <span className="text-amber-300 font-black px-1 rounded bg-amber-500/10 border border-amber-400/30">{bazi.day_pillar}日</span>
-            <span className="text-slate-300">{bazi.hour_pillar}时</span>
+            <span className="text-amber-400/90 font-sans font-semibold">
+              {isEn ? 'Four Pillars:' : '四柱八字：'}
+            </span>
+            <span className="text-slate-300">{isEn ? `Y: ${bazi.year_pillar}` : `${bazi.year_pillar}年`}</span>
+            <span className="text-slate-300">{isEn ? `M: ${bazi.month_pillar}` : `${bazi.month_pillar}月`}</span>
+            <span className="text-amber-300 font-black px-1 rounded bg-amber-500/10 border border-amber-400/30">
+              {isEn ? `D: ${bazi.day_pillar}` : `${bazi.day_pillar}日`}
+            </span>
+            <span className="text-slate-300">{isEn ? `H: ${bazi.hour_pillar}` : `${bazi.hour_pillar}时`}</span>
           </div>
         </div>
 
@@ -453,13 +514,15 @@ export default function ReportSummaryPage() {
         <div className="p-4 rounded-xl bg-gradient-to-r from-[#1C1613] via-[#15121B] to-[#0E1019] border border-amber-500/25 space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium">喜用神：</span>
+              <span className="text-xs text-slate-400 font-medium">
+                {isEn ? 'Useful Element:' : '喜用神：'}
+              </span>
               <span className="text-xl font-black text-gold-gradient">
                 {bazi.useful_element_name}（{bazi.ip_booster.boost}）
               </span>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300">
-              品牌加速器
+              {isEn ? 'Brand Accelerator' : '品牌加速器'}
             </span>
           </div>
 
@@ -478,7 +541,7 @@ export default function ReportSummaryPage() {
           <div className="p-3 rounded-xl bg-[#0E101A] border border-slate-800 space-y-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
               <Shirt className="w-3.5 h-3.5 text-amber-400" />
-              <span>适合品牌色/穿搭</span>
+              <span>{isEn ? 'Brand Color / Styling' : '适合品牌色/穿搭'}</span>
             </div>
             <div className="flex flex-wrap gap-1">
               {bazi.ip_booster.outfit_colors.map((c, i) => (
@@ -496,7 +559,7 @@ export default function ReportSummaryPage() {
           <div className="p-3 rounded-xl bg-[#0E101A] border border-slate-800 space-y-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-rose-300">
               <Camera className="w-3.5 h-3.5 text-rose-400" />
-              <span>镜头布景风格</span>
+              <span>{isEn ? 'Camera Backdrop Style' : '镜头布景风格'}</span>
             </div>
             <p className="text-[10px] text-slate-400 leading-tight">
               {bazi.ip_booster.backdrop_style}
@@ -512,45 +575,32 @@ export default function ReportSummaryPage() {
 
         <div className="relative z-10 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-[10px] font-bold text-amber-300">
-            <span>✨ 易玺老师 · 试听课进阶专享通道</span>
+            <span>
+              {isEn ? '✨ Master Yixi · Workshop Advanced VIP Channel' : '✨ 易玺老师 · 试听课进阶专享通道'}
+            </span>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
-            这只是你的第一层 IP DNA
+            {isEn ? 'This Is Only Your First Layer of IP DNA' : '这只是你的第一层 IP DNA'}
           </h2>
 
           <p className="text-xs text-slate-300 leading-relaxed font-normal">
-            真正具有商业闭环的个人品牌，不仅是看见一颗主星。
-            完整版《紫微 IP DNA 战略系统》将由<strong>易玺老师团队</strong>深度拆解：
+            {isEn
+              ? 'A truly commercially viable personal brand requires more than identifying a single star. The full ZIWEI IP DNA Strategic System will be thoroughly deconstructed by Master Yixi\'s advisory team:'
+              : '真正具有商业闭环的个人品牌，不仅是看见一颗主星。完整版《紫微 IP DNA 战略系统》将由易玺老师团队深度拆解：'}
           </p>
         </div>
 
         {/* 完整版进阶 8 大维度标签 */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] font-semibold text-slate-200">
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 核心人格深层动机
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 官禄宫 · 商业价值
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 财帛宫 · 变现路径
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 身宫 · 人生后半场
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 三方四正 · 资源格局
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 生年/命宫四化暗线
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 客群画像与收费定价
-          </div>
-          <div className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90">
-            🔒 2026-2027 爆发大限
-          </div>
+          {lockedDimensions.map((item, idx) => (
+            <div
+              key={idx}
+              className="p-2 rounded-lg bg-[#0F111C] border border-amber-500/20 text-center text-amber-200/90"
+            >
+              {item}
+            </div>
+          ))}
         </div>
 
         {/* 预约导师闭门沟通 CTA */}
@@ -559,12 +609,18 @@ export default function ReportSummaryPage() {
             href="/consultation"
             className="w-full py-3.5 rounded-xl btn-solar-gold font-bold text-xs sm:text-sm text-center shadow-lg shadow-rose-950/50 transition flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>解锁我的完整 IP DNA · 预约易玺老师 1对1 破局</span>
+            <span>
+              {isEn
+                ? 'Unlock Full IP DNA · Book Master Yixi 1-on-1 Strategy Session'
+                : '解锁我的完整 IP DNA · 预约易玺老师 1对1 破局'}
+            </span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
           <p className="text-center text-[10px] text-slate-400">
-            仅限本场试听课现场学员，开放少量一对一战略咨询席位
+            {isEn
+              ? 'Exclusive to workshop attendees. Limited 1-on-1 strategy sessions available.'
+              : '仅限本场试听课现场学员，开放少量一对一战略咨询席位'}
           </p>
         </div>
       </div>
@@ -572,7 +628,7 @@ export default function ReportSummaryPage() {
       {/* 9. SECTION 15 & 42: 系统免责声明 */}
       <div className="rounded-xl bg-[#090B14] border border-slate-800/80 p-3.5 text-center">
         <p className="text-[10px] text-slate-500 leading-relaxed">
-          {SYSTEM_DISCLAIMER}
+          {isEn ? SYSTEM_DISCLAIMER_EN : SYSTEM_DISCLAIMER}
         </p>
       </div>
 
@@ -592,7 +648,9 @@ export default function ReportSummaryPage() {
             <div className="rounded-2xl bg-gradient-to-b from-[#18131E] to-[#0A0C14] p-4 border border-amber-500/30 shadow-inner space-y-3">
               <div className="flex items-center justify-between text-[10px] font-bold text-amber-300">
                 <span>ZIWEI IP DNA™</span>
-                <span className="text-rose-400 font-mono">易玺老师·战略系统</span>
+                <span className="text-rose-400 font-mono">
+                  {isEn ? 'Master Yixi · Strategy' : '易玺老师·战略系统'}
+                </span>
               </div>
 
               {/* Central Official Logo Graphic */}
@@ -607,7 +665,7 @@ export default function ReportSummaryPage() {
 
               <div>
                 <span className="text-[10px] text-slate-400 block font-medium">
-                  {user.name} 的核心 IP 原型
+                  {user.name} {isEn ? "'s Core IP Archetype" : '的核心 IP 原型'}
                 </span>
                 <h3 className="text-xl font-serif font-black text-gold-gradient">
                   {familyInfo.name}
@@ -619,25 +677,31 @@ export default function ReportSummaryPage() {
 
               {/* 核心碰撞一句话 */}
               <div className="p-2.5 rounded-lg bg-[#141624] border border-amber-500/20 text-left text-[10px] text-slate-300 leading-snug">
-                <span className="font-bold text-amber-400">命迁碰撞：</span>
-                <span>{ziwei.collision_summary.split('。')[0]}。</span>
+                <span className="font-bold text-amber-400">
+                  {isEn ? 'IP Collision: ' : '命迁碰撞：'}
+                </span>
+                <span>{ziwei.collision_summary.split(isEn ? '.' : '。')[0]}{isEn ? '.' : '。'}</span>
               </div>
 
               {/* 五行放大器与四柱 */}
               <div className="flex flex-col gap-1 text-[10px] text-slate-400 pt-1.5 border-t border-slate-800 font-mono">
                 <div className="flex items-center justify-between">
-                  <span>四柱：{bazi.year_pillar} {bazi.month_pillar} {bazi.day_pillar} {bazi.hour_pillar}</span>
+                  <span>
+                    {isEn ? 'Pillars: ' : '四柱：'}
+                    {bazi.year_pillar} {bazi.month_pillar} {bazi.day_pillar} {bazi.hour_pillar}
+                  </span>
                   <span className="font-bold text-gold-gradient">
-                    喜用：{bazi.useful_element_name}（{bazi.ip_booster.boost}）
+                    {isEn ? 'Useful: ' : '喜用：'}
+                    {bazi.useful_element_name}（{bazi.ip_booster.boost}）
                   </span>
                 </div>
               </div>
 
               {/* QR Code Demo Placeholder */}
               <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[9px] text-slate-400">
-                <span>扫码测你的 IP DNA</span>
+                <span>{isEn ? 'Scan to Discover Your IP DNA' : '扫码测你的 IP DNA'}</span>
                 <div className="w-9 h-9 rounded-md bg-amber-500 text-slate-950 flex items-center justify-center font-mono text-[7px] font-black">
-                  [二维码]
+                  {isEn ? '[QR]' : '[二维码]'}
                 </div>
               </div>
             </div>
@@ -651,16 +715,20 @@ export default function ReportSummaryPage() {
                 {copiedLink ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-emerald-300" />
-                    <span>链接已复制！快去分享吧</span>
+                    <span>{isEn ? 'Link Copied! Go ahead and share' : '链接已复制！快去分享吧'}</span>
                   </>
                 ) : (
                   <>
                     <Share2 className="w-3.5 h-3.5" />
-                    <span>复制报告链接分享朋友</span>
+                    <span>{isEn ? 'Copy Report Link to Share' : '复制报告链接分享朋友'}</span>
                   </>
                 )}
               </button>
-              <p className="text-[10px] text-slate-400">手机端可截屏上方卡片保存至相册发朋友圈</p>
+              <p className="text-[10px] text-slate-400">
+                {isEn
+                  ? 'Take a screenshot of the card above to share to Instagram / LinkedIn / Moments'
+                  : '手机端可截屏上方卡片保存至相册发朋友圈'}
+              </p>
             </div>
           </div>
         </div>
