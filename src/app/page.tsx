@@ -283,13 +283,9 @@ export default function HomePage() {
           </button>
         </form>
 
-        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-          <span className="flex items-center gap-1 text-emerald-400 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            {isEn ? 'Traditional Engine · PDPA Privacy Guaranteed' : '大耕老师正统命理算法 · 隐私保护'}
-          </span>
+        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-center text-[11px] text-slate-400">
           <span className="text-amber-400/80 font-mono">
-            {isEn ? '2–3 Mins Result' : '2–3 分钟测出'}
+            {isEn ? '⚡ 2–3 Mins Instant Result' : '⚡ 2–3 分钟测出结果'}
           </span>
         </div>
       </div>

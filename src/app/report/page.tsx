@@ -441,8 +441,8 @@ export default function ReportSummaryPage() {
           <div className="p-2.5 rounded-lg bg-amber-500/15 border border-amber-400/25 text-amber-200 text-[11px] leading-relaxed">
             <span className="font-bold text-amber-300 block mb-0.5">
               {isEn
-                ? '⚡ Mutagen Strategic Key (Master Da Geng Lineage: Arising from Hua-Ji, Culminating in Hua-Lu):'
-                : '⚡ 四化赋能密码（大耕老师：起于忌，终于禄）：'}
+                ? '⚡ Mutagen Strategic Key (Arising from Hua-Ji, Culminating in Hua-Lu):'
+                : '⚡ 四化赋能密码（起于忌，终于禄）：'}
             </span>
             {ziwei.mutagen_insight}
           </div>
@@ -454,7 +454,7 @@ export default function ReportSummaryPage() {
         </div>
       </div>
 
-      {/* 6. 隐形的第十三宫：身宫（深层价值追求 · 大耕老师入门班核心） */}
+      {/* 6. 隐形的第十三宫：身宫（深层价值追求与底层定位） */}
       <div className="rounded-2xl card-obsidian p-4 sm:p-5 space-y-2">
         <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20">
           <div className="flex items-center gap-2">
