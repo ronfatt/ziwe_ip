@@ -1012,7 +1012,11 @@ export function getLocalizedPreviewResult(res: PreviewV01Result, isEn: boolean):
         outfit_colors: boosterEn.outfitColors,
         backdrop_style: boosterEn.backdropStyle
       }
-    }
+    },
+    formations: res.formations,
+    primary_formation: res.primary_formation,
+    classic_quote: res.classic_quote,
+    famous_leaders: res.famous_leaders
   };
 }
 

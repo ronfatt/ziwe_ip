@@ -69,7 +69,7 @@ interface AssessmentStore extends AssessmentState {
   runAnalysis: () => void;
   resetAll: () => void;
   loadDemoSeed: () => void;
-  quickAnalyzeFromBirth: (birthDate: string, displayName?: string, birthTime?: string, gender?: any) => void;
+  quickAnalyzeFromBirth: (birthDate: string, displayName?: string, birthTime?: string, gender?: any, city?: string) => void;
 }
 
 const STORAGE_KEY = 'ziwei_ip_dna_state_v2';
@@ -285,7 +285,7 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => {
     }
   },
 
-  quickAnalyzeFromBirth: (birthDate: string, displayName?: string, birthTime?: string, gender?: any) => {
+  quickAnalyzeFromBirth: (birthDate: string, displayName?: string, birthTime?: string, gender?: any, city?: string) => {
     // Map birth date to one of presets deterministically
     let hash = 0;
     for (let i = 0; i < birthDate.length; i++) {
@@ -299,7 +299,7 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => {
       displayName: displayName?.trim() || '学员',
       birthDate,
       birthTime: birthTime || '10:00',
-      birthLocation: '中国 / 东南亚',
+      birthLocation: city || '吉隆坡',
       timeConfidence: birthTime ? 'exact' : 'approximate',
       gender: gender || 'unspecified',
       privacyConsent: true
@@ -322,7 +322,9 @@ export const useAssessmentStore = create<AssessmentStore>((set, get) => {
       name: updatedBirthInfo.displayName,
       gender: updatedBirthInfo.gender,
       birthDate: updatedBirthInfo.birthDate,
-      birthTime: updatedBirthInfo.birthTime
+      birthTime: updatedBirthInfo.birthTime,
+      city: city || '吉隆坡',
+      useTrueSolarTime: true
     });
 
     set({

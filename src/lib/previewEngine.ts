@@ -14,6 +14,11 @@ import {
 } from '@/data/previewV01Data';
 import { calculateRealZiweiChart, ZiweiRealChartOutput } from './ziweiRealEngine';
 import { EARTHLY_BRANCHES } from './lunarCalendar';
+import { calculateTrueSolarTime, TrueSolarTimeOutput } from './time/trueSolarTime';
+import { findCityByName } from './time/cities';
+import { detectBrandFormations, BrandFormation, SimplifiedChart } from './patternEngine';
+import { getClassicQuoteForStars, ClassicQuote } from './classicQuotes';
+import { getFamousLeadersForArchetype, FamousLeader } from './famousFigures';
 
 // 五行映射字典
 const STEM_ELEMENTS: Record<string, ElementKey> = {
@@ -35,6 +40,9 @@ export interface PreviewEngineInput {
   birthDate: string; // YYYY-MM-DD
   birthTime?: string; // HH:mm
   timezone?: string;
+  city?: string;
+  longitude?: number;
+  useTrueSolarTime?: boolean;
 }
 
 export interface PreviewV01Result {
@@ -45,6 +53,11 @@ export interface PreviewV01Result {
     birth_time: string;
     timezone: string;
     lunar_date_str: string;
+    city?: string;
+    true_solar_time_str?: string;
+    true_solar_offset_minutes?: number;
+    true_solar_explanation?: string;
+    true_solar_explanation_en?: string;
   };
   ziwei: {
     ming_palace: {
@@ -101,6 +114,11 @@ export interface PreviewV01Result {
       backdrop_style: string;
     };
   };
+  // 开源赋能四大高价值模块
+  formations: BrandFormation[];
+  primary_formation: BrandFormation;
+  classic_quote: ClassicQuote;
+  famous_leaders: FamousLeader[];
 }
 
 /**
@@ -213,21 +231,59 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
     gender = 'male',
     birthDate,
     birthTime = '12:00',
-    timezone = 'Asia/Kuala_Lumpur'
+    timezone = 'Asia/Kuala_Lumpur',
+    city,
+    longitude: customLongitude,
+    useTrueSolarTime = true
   } = input;
 
-  // 1. 解析阳历日期
+  // 1. 解析阳历日期与时间
   const [yStr, mStr, dStr] = (birthDate || '1995-08-18').split('-');
-  const solarYear = parseInt(yStr, 10) || 1995;
-  const solarMonth = parseInt(mStr, 10) || 8;
-  const solarDay = parseInt(dStr, 10) || 18;
+  let solarYear = parseInt(yStr, 10) || 1995;
+  let solarMonth = parseInt(mStr, 10) || 8;
+  let solarDay = parseInt(dStr, 10) || 18;
+
+  const [hStr, minStr] = birthTime.split(':');
+  const clockHour = parseInt(hStr, 10) || 12;
+  const clockMinute = parseInt(minStr, 10) || 0;
+
+  // 城市匹配与真太阳时计算 (适配马来西亚、新加坡、港澳台与中国各主要城市)
+  let effectiveLongitude = customLongitude;
+  const matchedCity = city ? findCityByName(city) : undefined;
+  if (effectiveLongitude === undefined && matchedCity) {
+    effectiveLongitude = matchedCity.longitude;
+  }
+
+  let trueSolarInfo: TrueSolarTimeOutput | undefined;
+  let effectiveBirthTime = birthTime;
+
+  if (useTrueSolarTime && effectiveLongitude !== undefined) {
+    trueSolarInfo = calculateTrueSolarTime({
+      year: solarYear,
+      month: solarMonth,
+      day: solarDay,
+      clockHour,
+      clockMinute,
+      longitude: effectiveLongitude
+    });
+
+    effectiveBirthTime = trueSolarInfo.trueSolarTimeStr;
+
+    // 处理真太阳时跨日偏移 (如 23:00 之后校正跨日)
+    if (trueSolarInfo.dayOffset !== 0) {
+      const dt = new Date(Date.UTC(solarYear, solarMonth - 1, solarDay + trueSolarInfo.dayOffset));
+      solarYear = dt.getUTCFullYear();
+      solarMonth = dt.getUTCMonth() + 1;
+      solarDay = dt.getUTCDate();
+    }
+  }
 
   // 2. 调用真实的南派紫微排盘核心
   const realChart: ZiweiRealChartOutput = calculateRealZiweiChart(
     solarYear,
     solarMonth,
     solarDay,
-    birthTime
+    effectiveBirthTime
   );
 
   const { lunar, mutagens } = realChart;
@@ -298,6 +354,35 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
 
   const lunarDateStr = `农历 ${lunar.yearPillar}年 ${lunar.isLeap ? '闰' : ''}${lunar.lunarMonth}月${lunar.lunarDay}日 ${lunar.hourBranchName}时`;
 
+  // 8. 经典大格局检测 (融合开源模式识别引擎)
+  const simplifiedChart: SimplifiedChart = {
+    mingBranch: realChart.mingPalaceBranchIndex,
+    shenBranch: realChart.palaces.find((p) => p.name === realChart.shenPalaceName)?.branchIndex ?? 0,
+    yearStem: lunar.yearPillar[0],
+    yearBranch: lunar.yearPillar[1],
+    palaces: realChart.palaces.map((p) => ({
+      branch: p.branchIndex,
+      name: p.name,
+      stars: p.allStars || p.majorStars
+    }))
+  };
+  const formations = detectBrandFormations(simplifiedChart);
+  const primaryFormation = formations[0];
+
+  // 9. 古籍原典点睛 (《骨髓赋》/《紫微斗数全书》)
+  const classicQuote = getClassicQuoteForStars(mingStars) || {
+    star: mingStars[0] || '紫微',
+    source: '《骨髓赋》',
+    sourceEn: 'Gu Sui Fu',
+    originalText: '紫微帝座为众星之尊，得辅弼为相，得昌曲为秀。',
+    originalTextEn: 'Ziwei, the Sovereign Emperor, reigns supreme among all stars.',
+    modernInsight: '【易玺老师·IP点睛】天生自带王者视野，坐镇核心，制定行业标准。',
+    modernInsightEn: 'Master Yixi Insight: Natural sovereign perspective. Formulate the standards of your category.'
+  };
+
+  // 10. 商业领袖同频镜像
+  const famousLeaders = getFamousLeadersForArchetype(mingComb.ipFamilyId);
+
   return {
     user: {
       name: name.trim() || '学员',
@@ -305,7 +390,12 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
       birth_date: birthDate,
       birth_time: birthTime,
       timezone,
-      lunar_date_str: lunarDateStr
+      lunar_date_str: lunarDateStr,
+      city: matchedCity ? `${matchedCity.region} · ${matchedCity.name}` : city,
+      true_solar_time_str: trueSolarInfo?.trueSolarTimeStr,
+      true_solar_offset_minutes: trueSolarInfo?.totalOffsetMinutes,
+      true_solar_explanation: trueSolarInfo?.explanation,
+      true_solar_explanation_en: trueSolarInfo?.explanationEn
     },
     ziwei: {
       ming_palace: {
@@ -361,6 +451,10 @@ export function calculateZiweiIpDnaPreview(input: PreviewEngineInput): PreviewV0
         outfit_colors: elementDetails.outfitColors,
         backdrop_style: elementDetails.backdropStyle
       }
-    }
+    },
+    formations,
+    primary_formation: primaryFormation,
+    classic_quote: classicQuote,
+    famous_leaders: famousLeaders
   };
 }

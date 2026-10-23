@@ -155,9 +155,12 @@ export interface ZiweiRealChartOutput {
     branchName: string;
     stemName: string;
     majorStars: string[];
+    auxiliaryStars: string[];
+    allStars: string[];
   }[];
   mingStars: string[];
   migrationStars: string[];
+  auxiliaryStarsRecord: Record<number, string[]>;
   isMingEmpty: boolean;
   isMigrationEmpty: boolean;
   effectiveMingStars: string[];
@@ -252,16 +255,93 @@ export function calculateRealZiweiChart(
   branchStars[(tianfuBranchIndex + 6) % 12].push('七杀');
   branchStars[(tianfuBranchIndex + 10) % 12].push('破军');
 
-  // 7. 构建十二宫完整结构 (从命宫逆时针或顺时针？传统命盘宫位逆布：命、兄、夫、子、财、疾、迁、友、官、田、福、父)
+  // 6.2 排布辅曜（六吉星、禄马、六煞星）
+  const auxStars: Record<number, string[]> = {};
+  for (let i = 0; i < 12; i++) auxStars[i] = [];
+
+  // 左辅/右弼（依生月）
+  const zuoFuBranch = (4 + (lunarMonth - 1)) % 12;
+  const youBiBranch = (10 - (lunarMonth - 1) + 12) % 12;
+  auxStars[zuoFuBranch].push('左辅');
+  auxStars[youBiBranch].push('右弼');
+
+  // 文昌/文曲（依生时）
+  const wenChangBranch = (10 - hourBranchIndex + 12) % 12;
+  const wenQuBranch = (4 + hourBranchIndex) % 12;
+  auxStars[wenChangBranch].push('文昌');
+  auxStars[wenQuBranch].push('文曲');
+
+  // 天魁/天钺（依年干）
+  const kuiYueMap: Record<string, [number, number]> = {
+    甲: [1, 7], 戊: [1, 7], 庚: [1, 7],
+    乙: [0, 8], 己: [0, 8],
+    丙: [11, 9], 丁: [11, 9],
+    辛: [6, 2],
+    壬: [3, 5], 癸: [3, 5]
+  };
+  const [kuiBranch, yueBranch] = kuiYueMap[yearStem] || [1, 7];
+  auxStars[kuiBranch].push('天魁');
+  auxStars[yueBranch].push('天钺');
+
+  // 禄存/擎羊/陀罗（依年干）
+  const luCunMap: Record<string, number> = {
+    甲: 2, 乙: 3, 丙: 5, 丁: 6, 戊: 5, 己: 6, 庚: 8, 辛: 9, 壬: 11, 癸: 0
+  };
+  const luCunBranch = luCunMap[yearStem] ?? 2;
+  auxStars[luCunBranch].push('禄存');
+  const qingYangBranch = (luCunBranch + 1) % 12;
+  const tuoLuoBranch = (luCunBranch - 1 + 12) % 12;
+  auxStars[qingYangBranch].push('擎羊');
+  auxStars[tuoLuoBranch].push('陀罗');
+
+  // 天马（依年支）
+  const yearBranchIdx = EARTHLY_BRANCHES.indexOf(lunar.yearBranch);
+  const tianMaMap: Record<number, number> = {
+    8: 2, 0: 2, 4: 2,   // 申子辰马在寅
+    2: 8, 6: 8, 10: 8,  // 寅午戌马在申
+    5: 11, 9: 11, 1: 11, // 巳酉丑马在亥
+    11: 5, 3: 5, 7: 5   // 亥卯未马在巳
+  };
+  const tianMaBranch = tianMaMap[yearBranchIdx] ?? 2;
+  auxStars[tianMaBranch].push('天马');
+
+  // 地劫/地空（依生时）
+  const diJieBranch = (11 + hourBranchIndex) % 12;
+  const diKongBranch = (11 - hourBranchIndex + 12) % 12;
+  auxStars[diJieBranch].push('地劫');
+  auxStars[diKongBranch].push('地空');
+
+  // 火星/铃星（依年支与生时）
+  let huoStart = 1;
+  let lingStart = 3;
+  const yb = yearBranchIdx;
+  if (yb === 2 || yb === 6 || yb === 10) {
+    huoStart = 1; lingStart = 3;
+  } else if (yb === 8 || yb === 0 || yb === 4) {
+    huoStart = 2; lingStart = 10;
+  } else if (yb === 5 || yb === 9 || yb === 1) {
+    huoStart = 3; lingStart = 10;
+  } else if (yb === 11 || yb === 3 || yb === 7) {
+    huoStart = 9; lingStart = 10;
+  }
+  const huoBranch = (huoStart + hourBranchIndex) % 12;
+  const lingBranch = (lingStart + hourBranchIndex) % 12;
+  auxStars[huoBranch].push('火星');
+  auxStars[lingBranch].push('铃星');
+
+  // 7. 构建十二宫完整结构 (从命宫逆时针分布各宫位)
   const palaces = TWELVE_PALACES.map((palaceName, idx) => {
-    // 传统十二宫地支位置：命宫逆时针分布各宫位
     const branchIdx = (mingPalaceBranchIndex - idx + 12) % 12;
+    const mStars = branchStars[branchIdx] || [];
+    const aStars = auxStars[branchIdx] || [];
     return {
       name: palaceName,
       branchIndex: branchIdx,
       branchName: EARTHLY_BRANCHES[branchIdx],
       stemName: palaceStems[branchIdx],
-      majorStars: branchStars[branchIdx]
+      majorStars: mStars,
+      auxiliaryStars: aStars,
+      allStars: [...mStars, ...aStars]
     };
   });
 
@@ -316,6 +396,7 @@ export function calculateRealZiweiChart(
     palaces,
     mingStars,
     migrationStars,
+    auxiliaryStarsRecord: auxStars,
     isMingEmpty,
     isMigrationEmpty,
     effectiveMingStars,

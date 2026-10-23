@@ -36,7 +36,20 @@ export default function HomePage() {
   const [gender, setGender] = useState<Gender>('male');
   const [birthDate, setBirthDate] = useState('1995-08-18');
   const [birthTime, setBirthTime] = useState('12:00');
+  const [birthCity, setBirthCity] = useState('吉隆坡');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 快捷城市列表 (大马主要城市及东南亚/大中华核心城市)
+  const QUICK_CITIES = [
+    { name: '吉隆坡', nameEn: 'Kuala Lumpur', flag: '🇲🇾' },
+    { name: '槟城', nameEn: 'Penang', flag: '🇲🇾' },
+    { name: '新山', nameEn: 'Johor Bahru', flag: '🇲🇾' },
+    { name: '新加坡', nameEn: 'Singapore', flag: '🇸🇬' },
+    { name: '香港', nameEn: 'Hong Kong', flag: '🇭🇰' },
+    { name: '台北', nameEn: 'Taipei', flag: '🇹🇼' },
+    { name: '北京', nameEn: 'Beijing', flag: '🇨🇳' },
+    { name: '上海', nameEn: 'Shanghai', flag: '🇨🇳' },
+  ];
 
   // 12 时辰快捷定义表 (Bilingual)
   const SHICHEN_LIST = [
@@ -61,7 +74,7 @@ export default function HomePage() {
       return;
     }
     setIsSubmitting(true);
-    quickAnalyzeFromBirth(birthDate, displayName, birthTime, gender);
+    quickAnalyzeFromBirth(birthDate, displayName, birthTime, gender, birthCity);
     router.push('/discover/analyze');
   };
 
@@ -221,6 +234,40 @@ export default function HomePage() {
               onChange={(e) => setBirthDate(e.target.value)}
               className="w-full rounded-xl bg-[#0F111D] border border-slate-700/80 px-3.5 py-2.5 text-sm font-medium text-white focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 focus:outline-none transition [color-scheme:dark]"
             />
+          </div>
+
+          {/* 出生城市与真太阳时校准 */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-300">
+                {isEn ? 'Birth City / Region' : '出生地点 / 城市'}
+              </label>
+              <span className="text-[10px] text-amber-400 font-medium flex items-center gap-1">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {isEn ? 'True Solar Time Calibrated' : '真太阳时高精校准'}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_CITIES.map((c) => {
+                const isSelected = birthCity === c.name || birthCity === c.nameEn;
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => setBirthCity(c.name)}
+                    className={`py-1 px-2.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1 cursor-pointer ${
+                      isSelected
+                        ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-sm font-bold'
+                        : 'bg-[#0E1019] border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                  >
+                    <span>{c.flag}</span>
+                    <span>{isEn ? c.nameEn : c.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* 出生时辰（快捷选择 + 精确时间） */}

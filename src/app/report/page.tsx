@@ -55,7 +55,8 @@ export default function ReportSummaryPage() {
         name: birthInfo.displayName || (isEn ? 'Student' : '学员'),
         gender: birthInfo.gender || 'male',
         birthDate: birthInfo.birthDate || '1995-08-18',
-        birthTime: birthInfo.birthTime || '12:00'
+        birthTime: birthInfo.birthTime || '12:00',
+        city: birthInfo.birthLocation || '吉隆坡'
       });
 
   const result: PreviewV01Result = getLocalizedPreviewResult(rawResult, isEn);
@@ -172,6 +173,25 @@ export default function ReportSummaryPage() {
           <span>{isEn ? 'Share Poster' : '生成分享海报'}</span>
         </button>
       </div>
+
+      {/* 真太阳时高精校准说明胶囊 */}
+      {user.true_solar_time_str && (
+        <div className="flex items-center justify-between text-[11px] text-amber-300/90 bg-[#121422] border border-amber-500/25 px-3 py-1.5 rounded-xl shadow-sm">
+          <div className="flex items-center gap-1.5 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>
+              {user.city ? `${user.city} · ` : ''}
+              {isEn ? 'True Solar Time: ' : '地方真太阳时：'}
+              <strong className="text-white font-mono">{user.true_solar_time_str}</strong>
+            </span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-mono">
+            {user.true_solar_offset_minutes !== undefined && user.true_solar_offset_minutes !== 0
+              ? (isEn ? `(${user.true_solar_offset_minutes > 0 ? '+' : ''}${user.true_solar_offset_minutes}m offset)` : `(时差 ${user.true_solar_offset_minutes > 0 ? '+' : ''}${user.true_solar_offset_minutes}分)`)
+              : (isEn ? 'Aligned' : '标准时对齐')}
+          </span>
+        </div>
+      )}
 
       {/* 2. SECTION 01 & 02 & 03: HERO BANNER - 姓名 & 六大核心 IP 家族 */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1A121F] via-[#10121C] to-[#0A0C14] p-5 border border-amber-500/30 shadow-2xl shadow-rose-950/30 space-y-3">
@@ -343,6 +363,31 @@ export default function ReportSummaryPage() {
         </div>
       </div>
 
+      {/* 3.5 古籍原典点睛 · 宗师箴言 (源自《骨髓赋》/《全书》) */}
+      {result.classic_quote && (
+        <div className="rounded-2xl card-obsidian p-4 border border-amber-500/30 bg-gradient-to-r from-[#17141f] via-[#121422] to-[#0c0e18] space-y-2.5 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 text-sm">📜</span>
+              <span className="text-xs font-bold text-white tracking-wide">
+                {isEn ? 'Ancient Lineage Wisdom' : '古籍原典点睛'} · {isEn ? result.classic_quote.sourceEn : result.classic_quote.source}
+              </span>
+            </div>
+            <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-400/30 px-2 py-0.5 rounded-md">
+              {isEn ? 'Classical Doctrine' : '道统传承'}
+            </span>
+          </div>
+
+          <blockquote className="text-xs text-amber-200/90 italic font-serif border-l-2 border-amber-400/60 pl-3 py-1 leading-relaxed bg-[#0A0C16]/50 rounded-r-lg">
+            “{isEn ? result.classic_quote.originalTextEn : result.classic_quote.originalText}”
+          </blockquote>
+
+          <p className="text-[11px] text-slate-300 font-medium leading-relaxed bg-[#0E101B] p-2.5 rounded-xl border border-slate-800">
+            {isEn ? result.classic_quote.modernInsightEn : result.classic_quote.modernInsight}
+          </p>
+        </div>
+      )}
+
       {/* 4. SECTION 07, 08, 09: 你的迁移宫 (公众感知 / 外显人格 / “别人怎么看我”) */}
       <div className="rounded-2xl card-obsidian p-5 space-y-3.5">
         <div className="flex items-center justify-between pb-2 border-b border-rose-500/20">
@@ -491,6 +536,125 @@ export default function ReportSummaryPage() {
           {ziwei.shen_palace.meaning}
         </p>
       </div>
+
+      {/* 6.5 经典大格局 · 品牌战略护城河 (开源格局引擎深度转译) */}
+      {result.primary_formation && (
+        <div className="rounded-2xl card-obsidian p-5 border border-amber-400/40 bg-gradient-to-br from-[#1C151F] via-[#121320] to-[#0A0C16] shadow-xl shadow-rose-950/20 space-y-3.5">
+          <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-400/30">
+                <Award className="w-4 h-4 text-amber-400" />
+              </div>
+              <div>
+                <h2 className="text-sm font-black text-white">
+                  {isEn ? 'Classical Brand Strategic Formation' : '激活经典大格局 · 品牌战略护城河'}
+                </h2>
+                <span className="text-[10px] text-slate-400">
+                  {isEn ? result.primary_formation.sourceEn : result.primary_formation.source}
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-black text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 px-2.5 py-0.5 rounded-full shadow-sm">
+              {isEn ? result.primary_formation.badgeEn : result.primary_formation.badge}
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+              {isEn ? result.primary_formation.nameEn : result.primary_formation.name}
+            </span>
+            <div className="text-lg font-black text-gold-gradient">
+              {isEn ? result.primary_formation.ipTitleEn : result.primary_formation.ipTitle}
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0E101B] border border-amber-500/20 space-y-1.5">
+            <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>{isEn ? 'Strategic Moat:' : '超级护城河：'}</span>
+            </div>
+            <p className="text-xs text-slate-200 leading-relaxed font-medium">
+              {isEn ? result.primary_formation.ipMoatEn : result.primary_formation.ipMoat}
+            </p>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#14121F] border border-rose-500/20 space-y-1.5">
+            <div className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+              <Target className="w-3.5 h-3.5 text-rose-400" />
+              <span>{isEn ? 'Master Yixi Strategic Advice:' : '易玺老师·战略谏言：'}</span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed font-medium">
+              {isEn ? result.primary_formation.strategicAdviceEn : result.primary_formation.strategicAdvice}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 6.8 商业领袖 · 同频原型镜像 */}
+      {result.famous_leaders && result.famous_leaders.length > 0 && (
+        <div className="rounded-2xl card-obsidian p-5 space-y-3.5">
+          <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs border border-amber-400/30">
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              </div>
+              <div>
+                <h2 className="text-sm font-black text-white">
+                  {isEn ? 'Business Leaders Sharing Your Archetype' : '商业领袖 · 同频原型镜像'}
+                </h2>
+                <span className="text-[10px] text-slate-400">
+                  {isEn ? 'How global icons leverage this exact IP frequency' : '看看时代领袖如何将该原型发挥到极致'}
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-0.5 rounded-md">
+              {isEn ? 'Archetype Mirror' : '同频镜像'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {result.famous_leaders.map((leader) => (
+              <div
+                key={leader.id}
+                className="p-3.5 rounded-xl bg-gradient-to-b from-[#141624] to-[#0E101B] border border-slate-800 space-y-2 flex flex-col justify-between"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{leader.avatarBadge}</span>
+                      <span className="text-sm font-black text-white">
+                        {isEn ? leader.nameEn : leader.name}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      {leader.keyStars.map((st, i) => (
+                        <span
+                          key={i}
+                          className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-400/25 text-amber-300"
+                        >
+                          {st}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] font-semibold text-slate-400">
+                    {isEn ? leader.titleEn : leader.title}
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed font-medium pt-1">
+                    {isEn ? leader.resonancePointEn : leader.resonancePoint}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800/80 text-[11px] font-medium text-amber-200/90 italic">
+                  {isEn ? leader.takeawayQuoteEn : leader.takeawayQuote}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 7. SECTION 11, 12, 13: 八字日柱与品牌能量放大器 (五行 IP Booster) */}
       <div className="rounded-2xl card-obsidian p-5 space-y-4">
